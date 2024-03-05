@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>제목</Title>
+      <Description>설명</Description>
+      <Shortcut>GoClass</Shortcut>
+    </Header>
+    <Snippet>
+      <Code Language="CPP">
+        <![CDATA[class $ClassName$ : public GameObject
+                {
+                 protected:
+				 
+				 public:
+					$ClassName$(const std::string&name = "");
+					~$ClassName$() override = default;
+				 
+					void Init() override;
+					void Release() override;
+
+					void Reset() override;
+
+					void Update(float dt) override;
+					void LateUpdate(float dt) override;
+					void FixedUpdate(float dt) override;
+					
+					void Draw(sf::RenderWindow& window) override;
+                };]]>
+      </Code>
+      <Declarations>
+        <Literal>
+          <ID>ClassName</ID>
+          <ToolTip>Input class name</ToolTip>
+          <Default>className</Default>
+        </Literal>
+      </Declarations>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
