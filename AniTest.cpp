@@ -34,14 +34,14 @@ void AniTest::Reset()
 {
 	animator.ClearEvent();
 
-	std::function<void()> funcInstance = std::bind(&AniTest::TestInstance, this);
-	animator.AddEvent("data/Jump.csv", 5, funcInstance);
+	//std::function<void()> funcInstance = std::bind(&AniTest::TestInstance, this);
+	//animator.AddEvent("data/Jump.csv", 5, funcInstance);
+	//
+	//std::function<void()> funcStatic = std::bind(&AniTest::TestStatic);
+	//animator.AddEvent("data/Idle.csv", 5, funcStatic);
 
-	std::function<void()> funcStatic = std::bind(&AniTest::TestStatic);
-	animator.AddEvent("data/Idle.csv", 5, funcStatic);
 
-
-	animator.Play("data/Idle.csv");
+	animator.Play("Data/Player_Idle.csv");
 	SetOrigin(Origins::MC);
 	SetPosition({ FRAMEWORK.GetWindowSize().x * 0.5f ,
 		FRAMEWORK.GetWindowSize().y * 0.5f });
@@ -57,7 +57,7 @@ void AniTest::Update(float dt)
 	if (isGround && InputMgr::GetKeyDown(sf::Keyboard::Space))
 	{
 		isGround = false;
-		animator.Play("data/Jump.csv");
+		animator.Play("Data/Player_Idle.csv");
 		velocity.y = -500.f;
 	}
 
@@ -79,31 +79,31 @@ void AniTest::Update(float dt)
 		SetFlipX(h < 0);
 	}
 
-	if (animator.GetCurrentClipId() == "data/Idle.csv")
+	if (animator.GetCurrentClipId() == "Data/Player_Idle.csv")
 	{
 		if (h != 0.f)
 		{
-			animator.Play("data/Run.csv");
+			animator.Play("Data/Player_Idle.csv");
 		}
 	}
-	else if (animator.GetCurrentClipId() == "data/Run.csv")
+	else if (animator.GetCurrentClipId() == "Data/Player_Idle.csv")
 	{
 		if (h == 0.f)
 		{
-			animator.Play("data/Idle.csv");
+			animator.Play("Data/Player_Idle.csv");
 		}
 
 	}
 
-	else if (animator.GetCurrentClipId() == "data/Jump.csv" && isGround)
+	else if (animator.GetCurrentClipId() == "Data/Player_Idle.csv" && isGround)
 	{
 		if (h == 0.f)
 		{
-			animator.Play("data/Idle.csv");
+			animator.Play("Data/Player_Idle.csv");
 		}
 		else
 		{
-			animator.Play("data/Run.csv");
+			animator.Play("Data/Player_Idle.csv");
 		}
 	}
 }

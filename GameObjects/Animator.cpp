@@ -9,7 +9,7 @@ Animator::Animator()
 
 Animator::~Animator()
 {
-
+	
 }
 
 void Animator::AddEvent(const std::string& clipId, int frame , std::function<void()> action)
@@ -20,12 +20,6 @@ void Animator::ClearEvent()
 {
 	eventList.clear();
 }
-
-
-
-
-
-
 
 //void Animator::AddClip(const AnimationClip& clip)
 //{

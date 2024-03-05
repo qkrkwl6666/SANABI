@@ -27,6 +27,7 @@
 #include "ResourceMgr.h"
 #include "SceneMgr.h"
 #include "DataTableMgr.h"
+#include "Animator.h"
 
 
 #include "Scene.h"
