@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Framework.h"
+#include "Crosshair.h"
 
 void Framework::Init(int width, int height, const std::string& name)
 {
@@ -14,6 +15,10 @@ void Framework::Init(int width, int height, const std::string& name)
 	//window.setSize({ 1280, 720 });
 	window.setPosition(sf::Vector2i((sf::VideoMode::getDesktopMode().width - window.getSize().x) / 2,
 		(sf::VideoMode::getDesktopMode().height - window.getSize().y) / 2 ));
+
+
+	mouse = new Crosshair();
+	mouse->Init();
 
 	DT_MGR.Init();
 	InputMgr::Init();
@@ -48,24 +53,27 @@ void Framework::Do()
 
 
 		SCENE_MGR.Update(GetDT());
+		mouse->Update(GetDT());
 
 		SCENE_MGR.LateUpdate(GetDT());
+		mouse->LateUpdate(GetDT());
 
 		if (fixedDeltaTime.asSeconds() >= fixedInterval)
 		{
 			SCENE_MGR.FixedUpdate(fixedDeltaTime.asSeconds());
-
+			mouse->FixedUpdate(GetDT());
 			fixedDeltaTime = sf::Time::Zero;
 		}
 		if (isDebug)
 		{
 			SCENE_MGR.DebugUpdate(GetDT());
-
+			mouse->DebugUpdate(GetDT());
 		}
 
 
 		window.clear();
 		SCENE_MGR.Draw(window);
+		mouse->Draw(window);
 
 		window.display();
 	}

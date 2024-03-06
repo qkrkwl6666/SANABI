@@ -135,7 +135,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Crosshair.cpp" />
+    <ClCompile Include="GameObjects\Player.cpp" />
     <ClCompile Include="Framework\Framework.cpp" />
     <ClCompile Include="Framework\Manager\DataTableMgr.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -158,10 +159,13 @@
     <ClCompile Include="Scenes\Scene.cpp" />
     <ClCompile Include="Scenes\SceneGame.cpp" />
     <ClCompile Include="Scenes\SceneTitle.cpp" />
-    <ClCompile Include="Weapon.cpp" />
+    <ClCompile Include="GameObjects\UI\UITitle.cpp" />
+    <ClCompile Include="GameObjects\Weapon.cpp" />
+    <ClCompile Include="SceneTileEditer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Player.h" />
+    <ClInclude Include="Crosshair.h" />
+    <ClInclude Include="GameObjects\Player.h" />
     <ClInclude Include="DataTable\DataTable.h" />
     <ClInclude Include="Framework\Defines.h" />
     <ClInclude Include="Framework\Framework.h" />
@@ -187,7 +191,9 @@
     <ClInclude Include="Scenes\Scene.h" />
     <ClInclude Include="Scenes\SceneGame.h" />
     <ClInclude Include="Scenes\SceneTitle.h" />
-    <ClInclude Include="Weapon.h" />
+    <ClInclude Include="GameObjects\UI\UITitle.h" />
+    <ClInclude Include="GameObjects\Weapon.h" />
+    <ClInclude Include="SceneTileEditer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MySnippet\XMLFile.snippet" />

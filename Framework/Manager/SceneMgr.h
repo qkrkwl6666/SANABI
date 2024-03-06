@@ -8,8 +8,8 @@ enum class SceneIds
 	None = -1,
 	SceneTitle,
 	SceneGame,
-	SceneScore,
 	SceneTest,
+	SceneTileEditer,
 	Count
 };
 
@@ -34,7 +34,6 @@ public:
 
 	Scene* GetCurrentScene() { return scenes[(int)currentScene]; }
 	Scene* GetScene(SceneIds id) { return scenes[(int)id]; }
-
 
 	void Update(float dt);
 	void LateUpdate(float dt);

@@ -3,8 +3,7 @@
 #include "Player.h"
 #include "SpriteGo.h"
 #include "rapidcsv.h"
-
-
+#include "UITitle.h"
 
 SceneTitle::SceneTitle(SceneIds id)
 	:Scene(id)
@@ -14,12 +13,13 @@ SceneTitle::SceneTitle(SceneIds id)
 
 void SceneTitle::Init()
 {
-
 	player = new Player("Player");
+	uiTitle = new UITitle("UiTitle");
 
 	// player->Init();
 
 	AddGo(player);
+	AddGo(uiTitle , Scene::Ui);
 	
 	Scene::Init();
 	player->Reset();

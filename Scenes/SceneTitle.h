@@ -3,6 +3,7 @@
 
 class Player;
 class SpriteGo;
+class UITitle;
 
 class SceneTitle : public Scene
 {
@@ -13,9 +14,9 @@ protected:
 	SceneTitle& operator=(SceneTitle&&) = delete;
 
 	Player* player = nullptr;
+	UITitle* uiTitle = nullptr;
 
 public:
-	
 
 	SceneTitle(SceneIds id);
 	~SceneTitle() override = default;
