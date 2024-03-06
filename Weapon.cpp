@@ -34,6 +34,8 @@ void Weapon::Init()
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Arm_Idle.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Arm_Running.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Arm_Jumping.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Arm_Falling.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Arm_Run_Stop.csv"));
 }
 
 void Weapon::Reset()

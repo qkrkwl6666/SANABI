@@ -46,6 +46,7 @@ void Player::Init()
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Run_Landing.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Fall_Start.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Falling.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Run_Stop.csv"));
 
 	/*auto* clip = animator->GetClip("Player_Run_Landing");
 	clip->fps = 30;*/
@@ -104,6 +105,7 @@ void Player::Update(float dt)
 	if (velocity.y > 100.f && !isGround && !Falling)
 	{
 		animator->Play("Player_Falling");
+		weaponAnimator->Play("Player_Arm_Falling");
 		Falling = true;
 	}
 
@@ -149,8 +151,8 @@ void Player::Update(float dt)
 	{
 		if (h == 0.f)
 		{
-			animator->Play("Player_Run_Landing");
-			weaponAnimator->Play("Player_Arm_Running");
+			animator->Play("Player_Run_Stop");
+			weaponAnimator->Play("Player_Arm_Run_Stop");
 		}
 	}
 
