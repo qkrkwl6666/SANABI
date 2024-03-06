@@ -49,12 +49,14 @@ void Scene::Release()
 {
 	for (auto obj : gameObjects)
 	{
-		delete obj;
+		if(obj != nullptr)
+			delete obj;
 	}
 	gameObjects.clear();
 	for (auto obj : uiObjects)
 	{
-		delete obj;
+		if (obj != nullptr)
+			delete obj;
 	}
 	uiObjects.clear();
 	deleteDeque.clear();

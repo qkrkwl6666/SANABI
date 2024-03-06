@@ -50,7 +50,7 @@ struct AnimaitionEvent
 class Animator
 {
 protected:
-	//std::unordered_map<std::string, AnimationClip> clips;
+	std::unordered_map<std::string, AnimationClip> clips;
 
 	std::queue<std::string> queue;
 	std::list<AnimaitionEvent> eventList;
@@ -77,12 +77,13 @@ public:
 	void ClearEvent();
 
 	bool isPlaying = false;
-	//void AddClip(const AnimationClip& clip); // 컨테이너에 클립 추가
+	void AddClip(const AnimationClip& clip); // 컨테이너에 클립 추가
 
 	const std::string& GetCurrentClipId() 
 	{ 
 		return currentClip->id; 
 	}
+
 	bool IsPlaying() const { return isPlaying; }
 
 	void SetTarget(sf::Sprite* t) { target = t; }// 타겟 설정
@@ -96,5 +97,17 @@ public:
 	void PlayQueue(const std::string& clipId);
 	void Stop();
 	void SetFrame(const AnimationFrame& frame);
+
+	void Falling();
+
+	//AnimationClip* GetClip(const std::string& clipId)
+	//{
+	//	auto it = clips.find(clipId);
+	//	if (it != clips.end())
+	//	{
+	//		return &(it->second);
+	//	}
+	//	return nullptr;
+	//}
 };
 

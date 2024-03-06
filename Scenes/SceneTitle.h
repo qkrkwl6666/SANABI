@@ -1,8 +1,6 @@
 #pragma once
 #include "Scene.h"
-#include "TextGo.h"
 
-class AniTest;
 class Player;
 class SpriteGo;
 
@@ -14,11 +12,11 @@ protected:
 	SceneTitle& operator=(const SceneTitle&) = delete;
 	SceneTitle& operator=(SceneTitle&&) = delete;
 
-public:
-	//Player* player;
+	Player* player = nullptr;
 
-	AniTest* aniTest;
+public:
 	
+
 	SceneTitle(SceneIds id);
 	~SceneTitle() override = default;
 
@@ -26,5 +24,7 @@ public:
 	void Update(float dt) override;
 	void Enter() override;
 	void Draw(sf::RenderWindow& window) override;
+	
+	Player* GetPlayer();
 };
 

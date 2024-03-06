@@ -16,19 +16,20 @@ void Animator::AddEvent(const std::string& clipId, int frame , std::function<voi
 {
 	eventList.push_back({ clipId , frame , action});
 }
+
 void Animator::ClearEvent()
 {
 	eventList.clear();
 }
 
-//void Animator::AddClip(const AnimationClip& clip)
-//{
-//	if (clips.find(clip.id) == clips.end())
-//	{
-//		//clips.insert({ clip.id , clip });
-//		clips[clip.id] = clip;
-//	}
-//}
+void Animator::AddClip(const AnimationClip& clip)
+{
+	if (clips.find(clip.id) == clips.end())
+	{
+		//clips.insert({ clip.id , clip });
+		clips[clip.id] = clip;
+	}
+}
 
 void Animator::Stop()
 {
@@ -66,7 +67,6 @@ void Animator::Update(float dt)
 			case AnimationLoopTypes::SINGLE:
 				currentFrame = totalFrame - 1;
 				isPlaying = false;
-
 				break;
 			case AnimationLoopTypes::LOOP:
 				currentFrame = 0;
@@ -94,6 +94,11 @@ void Animator::SetFrame(const AnimationFrame& frame)
 	target->setTextureRect(frame.texCoord);
 }
 
+void Animator::Falling()
+{
+	Play("Player_Falling");
+}
+
 void Animator::Play(const std::string& clipId, bool clearQueue)
 {
 	if (clearQueue)
@@ -106,10 +111,9 @@ void Animator::Play(const std::string& clipId, bool clearQueue)
 
 	// clipId가 find할때만 작동
 	
-	
 	isPlaying = true;
 	accumTime = 0.f;
-	currentClip = &RES_MGR_ANIMATIONCLIP.Get(clipId);
+	currentClip = &clips[clipId];
 	currentFrame = 0;
 	totalFrame = currentClip->GetTotalFrame();
 	clipDuration = 1.f / currentClip->fps; // 0.333
@@ -128,8 +132,8 @@ bool AnimationClip::loadFromFile(const std::string& filePath)
 
 	rapidcsv::Document doc(filePath);
 
-	//id = doc.GetCell<std::string>(0, 0);
-	id = filePath;
+	id = doc.GetCell<std::string>(0, 0);
+	//id = filePath;
 	fps = doc.GetCell<int>(1, 0);
 
 	loopType = (AnimationLoopTypes)doc.GetCell<int>(2, 0);

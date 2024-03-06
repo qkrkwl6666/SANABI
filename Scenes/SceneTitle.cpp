@@ -1,10 +1,9 @@
 #include "pch.h"
 #include "SceneTitle.h"
+#include "Player.h"
 #include "SpriteGo.h"
 #include "rapidcsv.h"
-#include "TextGo.h"
-#include "Player.h"
-#include "AniTest.h"
+
 
 
 SceneTitle::SceneTitle(SceneIds id)
@@ -15,18 +14,17 @@ SceneTitle::SceneTitle(SceneIds id)
 
 void SceneTitle::Init()
 {
+
+	player = new Player("Player");
+
+	// player->Init();
+
+	AddGo(player);
 	
-
-	aniTest = new AniTest();
-
-	aniTest->Reset();
-
 	Scene::Init();
+	player->Reset();
 
-	//player = new Player();
-	//player->Init();
-	//player->Reset();
-	//animator.Play("data/Idle.csv");
+
 }
 
 void SceneTitle::Update(float dt)
@@ -39,10 +37,19 @@ void SceneTitle::Update(float dt)
 void SceneTitle::Enter()
 {
 	Scene::Enter();
-
 }
 
 void SceneTitle::Draw(sf::RenderWindow& window)
 {
 	Scene::Draw(window);
+}
+
+Player* SceneTitle::GetPlayer()
+{
+	if (player != nullptr)
+	{
+		return player;
+	}
+
+	std::cout << "Player is nullptr !!" << std::endl;
 }
