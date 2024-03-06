@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SceneTileEditer.h"
+#include "TileMap.h"
 
 SceneTileEditer::SceneTileEditer(SceneIds id)
 	: Scene(SceneIds::SceneTileEditer)
@@ -9,7 +10,10 @@ SceneTileEditer::SceneTileEditer(SceneIds id)
 
 void SceneTileEditer::Init()
 {
+	tileMap = new TileMap("TileMap" , {40.f , 40.f} , {100, 100});
+	tileMap->Init();
 
+	AddGo(tileMap);
 }
 
 void SceneTileEditer::Update(float dt)

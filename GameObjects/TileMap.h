@@ -1,32 +1,40 @@
 #pragma once
 #include "GameObject.h"
+
+
 class TileMap : public GameObject
 {
+public:
+	struct Tile
+	{
+		// 타일 표시 테두리
+		sf::RectangleShape shape;
+		sf::Texture* texture;
+		int type;
+
+		Tile(sf::Vector2f position, sf::Vector2f size, int type)
+		{
+			shape.setPosition(position);
+			shape.setSize(size);
+			shape.setFillColor(sf::Color::White);
+			this->type = type;
+		}
+	};
+
 protected:
-	std::string spriteSheetId;
-	sf::Texture* texture;
-
-	sf::Vector2i cellCount;
-	sf::Vector2f cellSize;
-
-	sf::Transform transform;
-
-	sf::Vector2f boundaryLT;
-	sf::Vector2f boundaryRB;
+	std::vector<std::vector<Tile>> tiles;
+	sf::Vector2f tileSize; // 타일의 크기
+	sf::Vector2i tileMap; // 타일맵 전체 크기
 
 public:
-	sf::VertexArray va;
-	TileMap(const std::string& name = "name");
+	TileMap(const std::string& name, 
+		sf::Vector2f tileSize , sf::Vector2i tileMap);
 	~TileMap() = default;
 
 	TileMap(const TileMap&) = delete;
 	TileMap(TileMap&&) = delete;
 	TileMap& operator=(const TileMap&) = delete;
 	TileMap& operator=(TileMap&&) = delete;
-
-	void Set(const sf::Vector2i& count, const sf::Vector2f& size);
-	void SetSpriteSheetId(const std::string& id);
-	void UpdateTransform();
 
 	void Init() override;
 	void Release() override;
@@ -36,8 +44,6 @@ public:
 	void Update(float dt) override;
 	void Draw(sf::RenderWindow& window) override;
 
-
-
 	void SetOrigin(Origins preset) override;
 	void SetOrigin(const sf::Vector2f& newOrigin) override;
 
@@ -45,13 +51,10 @@ public:
 	void SetScale(const sf::Vector2f& scale) override;
 	void SetRotation(float r) override;
 	void Translate(const sf::Vector2f& delta) override;
-	void SetBoundary();
-	std::pair<const sf::Vector2f&, const sf::Vector2f&> GetBoundary() const;
 
 	void SetFlipX(bool flip) override;
 	void SetFlipY(bool flip) override;
 
-	sf::FloatRect GetLocalBoundsT() const;
-	sf::FloatRect GetGlobalBoundsT() const;
+
 };
 

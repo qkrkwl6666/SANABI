@@ -1,9 +1,12 @@
 #pragma once
 #include "Scene.h"
+
+class TileMap;
+
 class SceneTileEditer : public Scene
 {
 protected:
-
+	TileMap* tileMap;
 
 public:
 	SceneTileEditer(const SceneTileEditer&) = delete;

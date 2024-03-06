@@ -120,9 +120,8 @@ void UITitle::HandleMouseSelection()
 			selectBoxs[i]->SetTexture("graphics/UI/UI_MainScene_SelectBox_Selected.png");
 			if (InputMgr::GetMouseButtonDown(sf::Mouse::Left))
 			{
-				// 씬 전환 타일맵의 크기 및 타일의 크기
-
-
+				// 씬 전환 타일맵의 크기 및 타일의 크기 전달
+				SCENE_MGR.ChangeScene(SceneIds::SceneTileEditer);
 			}
 			break;
 		}
