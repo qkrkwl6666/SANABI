@@ -65,7 +65,6 @@ void TileEditer::HandleMouseSelection()
 	// UI 에서 월드 위치로 변환
 
 	// ui 좌표 mouse->GetPosition();
-
 	sf::Vector2i ScreenPos = SCENE_MGR.GetCurrentScene()->UiToScreen((sf::Vector2f)mouse->GetPosition());
 	sf::Vector2f worldPos = SCENE_MGR.GetCurrentScene()->ScreenToWorld((sf::Vector2i)ScreenPos);
 
@@ -73,5 +72,5 @@ void TileEditer::HandleMouseSelection()
 	sf::Vector2i tilePos = sf::Vector2i(static_cast<int>(worldPos.x / tileMap->GetTileSize().x),
 		static_cast<int>(worldPos.y / tileMap->GetTileSize().y));
 
-	tileMap->SetTileTexture(tilePos.x, tilePos.y, someTexture);
+	tileMap->SetTileTexture(tilePos.y, tilePos.x, someTexture);
 }
