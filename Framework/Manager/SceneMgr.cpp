@@ -2,6 +2,7 @@
 #include "SceneMgr.h"
 #include "SceneGame.h"
 #include "SceneTitle.h"
+#include "SceneTileEditer.h"
 
 SceneMgr::~SceneMgr()
 {
@@ -14,7 +15,7 @@ void SceneMgr::Init()
 
 	scenes.push_back(new SceneTitle(SceneIds::SceneTitle));
 	scenes.push_back(new SceneGame(SceneIds::SceneGame));
-	scenes.push_back(new SceneGame(SceneIds::SceneTileEditer));
+	scenes.push_back(new SceneTileEditer(SceneIds::SceneTileEditer));
 
 	for (auto scene : scenes)
 	{

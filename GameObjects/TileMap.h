@@ -16,7 +16,9 @@ public:
 		{
 			shape.setPosition(position);
 			shape.setSize(size);
-			shape.setFillColor(sf::Color::White);
+			shape.setFillColor(sf::Color::Black); // ¹è°æ»ö
+			shape.setOutlineThickness(0.5f); 
+			shape.setOutlineColor(sf::Color::White);
 			this->type = type;
 		}
 	};

@@ -11,22 +11,23 @@ SceneTileEditer::SceneTileEditer(SceneIds id)
 void SceneTileEditer::Init()
 {
 	tileMap = new TileMap("TileMap" , {40.f , 40.f} , {100, 100});
-	tileMap->Init();
+	 
+	AddGo(tileMap , Scene::World);
 
-	AddGo(tileMap);
+	Scene::Init();
 }
 
 void SceneTileEditer::Update(float dt)
 {
-
+	Scene::Update(dt);
 }
 
 void SceneTileEditer::Enter()
 {
-
+	Scene::Enter();
 }
 
 void SceneTileEditer::Draw(sf::RenderWindow & window)
 {
-
+	Scene::Draw(window);
 }

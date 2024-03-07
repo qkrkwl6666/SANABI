@@ -16,7 +16,6 @@ void Framework::Init(int width, int height, const std::string& name)
 	window.setPosition(sf::Vector2i((sf::VideoMode::getDesktopMode().width - window.getSize().x) / 2,
 		(sf::VideoMode::getDesktopMode().height - window.getSize().y) / 2 ));
 
-
 	mouse = new Crosshair();
 	mouse->Init();
 
@@ -51,7 +50,6 @@ void Framework::Do()
 		InputMgr::Update(GetDT());
 		SOUND_MGR.Update(GetDT());
 
-
 		SCENE_MGR.Update(GetDT());
 		mouse->Update(GetDT());
 
@@ -71,7 +69,7 @@ void Framework::Do()
 		}
 
 
-		window.clear();
+		window.clear(sf::Color::Black);
 		SCENE_MGR.Draw(window);
 		mouse->Draw(window);
 

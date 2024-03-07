@@ -19,7 +19,7 @@ void SceneTitle::Init()
 	// player->Init();
 
 	AddGo(player);
-	AddGo(uiTitle , Scene::Ui);
+	AddGo(uiTitle, Scene::Ui);
 	
 	Scene::Init();
 	player->Reset();
@@ -41,6 +41,7 @@ void SceneTitle::Enter()
 
 void SceneTitle::Draw(sf::RenderWindow& window)
 {
+
 	Scene::Draw(window);
 }
 
