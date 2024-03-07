@@ -23,8 +23,6 @@ void SceneTitle::Init()
 	
 	Scene::Init();
 	player->Reset();
-
-
 }
 
 void SceneTitle::Update(float dt)

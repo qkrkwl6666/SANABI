@@ -42,6 +42,7 @@ void TileMap::Update(float dt)
 
 void TileMap::Draw(sf::RenderWindow& window)
 {
+	GameObject::Draw(window);
 	// 모든 타일에 대해 반복
 	for (const auto& row : tiles)
 	{
@@ -96,5 +97,12 @@ void TileMap::SetFlipY(bool flip)
 {
 	GameObject::SetFlipY(flip);
 	
+}
+
+void TileMap::SetTileTexture(int x, int y, sf::Texture& t)
+{
+	tiles[x][y].shape.setTexture(&t);
+	tiles[x][y].shape.setFillColor(sf::Color::White);
+	//tiles[y][x].shape.setOutlineThickness(100.f);
 }
 

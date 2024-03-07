@@ -164,6 +164,7 @@
     <ClCompile Include="GameObjects\UI\UITitle.cpp" />
     <ClCompile Include="GameObjects\Weapon.cpp" />
     <ClCompile Include="Scenes\SceneTileEditer.cpp" />
+    <ClCompile Include="GameObjects\UI\TileEditer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Crosshair.h" />
@@ -198,6 +199,7 @@
     <ClInclude Include="GameObjects\UI\UITitle.h" />
     <ClInclude Include="GameObjects\Weapon.h" />
     <ClInclude Include="Scenes\SceneTileEditer.h" />
+    <ClInclude Include="GameObjects\UI\TileEditer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MySnippet\XMLFile.snippet" />

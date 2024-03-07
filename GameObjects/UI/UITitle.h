@@ -2,6 +2,8 @@
 
 #include "UIGo.h"
 
+class TileMap;
+
 class UITitle : public UIGo
 {
 protected:
