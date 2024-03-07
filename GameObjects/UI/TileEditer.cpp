@@ -140,9 +140,6 @@ void TileEditer::Update(float dt)
 	{
 		delta = lastMouseWorldPos - worldPos; // ¿Ãµø∑Æ.
 
-		std::cout << delta.x << std::endl;
-		std::cout << delta.y << std::endl;
-
 		sceneTileEditer->GetWorldView().move(delta); 
 	}
 
@@ -218,6 +215,12 @@ void TileEditer::TileMouseSelection()
 
 	tilePos = sf::Vector2i((worldPos.x / tileMap->GetTileSize().x),
 		(worldPos.y / tileMap->GetTileSize().y));
+
+	if (tilePos.x > tileMap->GetMapSize().x - 1 || tilePos.x < 0 ||
+		tilePos.y > tileMap->GetMapSize().y - 1 || tilePos.y < 0)
+	{
+		return;
+	}
 
 	tileMap->SetTileTexture(tilePos.y, tilePos.x, tilePath);
 }

@@ -60,6 +60,7 @@ public:
 
 	void SetTileTexture(int y , int x , const std::string& filePath);
 	sf::Vector2f GetTileSize() { return tileSize; }
+	sf::Vector2i GetMapSize() { return tileMap; }
 
 
 };
