@@ -99,9 +99,10 @@ void TileMap::SetFlipY(bool flip)
 	
 }
 
-void TileMap::SetTileTexture(int y, int x, sf::Texture* t)
+void TileMap::SetTileTexture(int y, int x, const std::string& filePath)
 {
-	tiles[y][x].shape.setTexture(t);
+	tiles[y][x].texture.loadFromFile(filePath);
+	tiles[y][x].shape.setTexture(&tiles[y][x].texture);
 	tiles[y][x].shape.setFillColor(sf::Color::White);
 }
 

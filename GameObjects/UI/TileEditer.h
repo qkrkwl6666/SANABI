@@ -26,7 +26,7 @@ protected:
 	sf::Vector2f tileSize;
 	sf::Vector2i mapSize;
 
-	sf::Texture tileTexture;
+	sf::String tilePath = "tileset/Spr_Stage1_Tileset_0.png";
 
 	sf::Vector2i screenPos;
 	sf::Vector2f worldPos;
@@ -55,14 +55,6 @@ public:
 	void TileSetTexture(const std::wstring& filePath);
 
 	std::wstring OpenFile(const wchar_t* filter = L"All Files (*.*)\0*.*\0", HWND owner = NULL);
-
-	// wstring to string
-	std::string w2s(const std::wstring& var)
-	{
-		static std::locale loc("");
-		auto& facet = std::use_facet<std::codecvt<wchar_t, char, std::mbstate_t>>(loc);
-		return std::wstring_convert<std::remove_reference<decltype(facet)>::type, wchar_t>(&facet).to_bytes(var);
-	}
 
 };
 

@@ -58,7 +58,7 @@ public:
 	void SetFlipX(bool flip) override;
 	void SetFlipY(bool flip) override;
 
-	void SetTileTexture(int y , int x , sf::Texture* t);
+	void SetTileTexture(int y , int x , const std::string& filePath);
 	sf::Vector2f GetTileSize() { return tileSize; }
 
 

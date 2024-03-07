@@ -15,7 +15,6 @@ public:
 	static sf::Vector2f RandomInUnitCircle();
 	static int RandomRange(int min, int maxExclude);
 
-
 	// Origin
 	static sf::Vector2f SetOrigin(sf::Transformable& obj, Origins originPreset, const sf::FloatRect& rect);
 	static sf::Vector2f SetOrigin(sf::Sprite& obj, Origins originPreset);
@@ -52,5 +51,6 @@ public:
 	// CP949 to WSTRING
 	static std::wstring CP949ToWString(const std::string& str);
 
-	
+	// WSTRING to STRING
+	static std::string WSTRINGToString(const std::wstring& var);
 };

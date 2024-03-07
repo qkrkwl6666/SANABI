@@ -26,7 +26,8 @@ void TileEditer::Init()
 		(SCENE_MGR.GetScene(SceneIds::SceneTileEditer));
 
 	tileMap = sceneTileEditer->GetTitleMap();
-	tileTexture.loadFromFile("tileset/Spr_Stage1_Tileset_0.png");
+	//tilePath = "tileset/Spr_Stage1_Tileset_0.png";
+	//tileTexture.loadFromFile("tileset/Spr_Stage1_Tileset_0.png");
 
 	// *************************선택 배경*************************
 	NewSpriteGo("SelectBackground", "graphics/UI/UI_Setting_BG.png");
@@ -158,8 +159,6 @@ void TileEditer::HandleMouseSelection()
 	// UI 에서 월드 위치로 변환
 
 	// ui 좌표 mouse->GetPosition();
-	// TODO : 타일텍스처 사용후 다른 텍스처 선택하면 
-	// 기존에 있던 텍스처도 같이 변경하는 버그 해결해야함
 	for (int i = 0; i < 3; i++)
 	{
 		if (selectBoxs[i]->GetGlobalBounds().contains(mouse->GetPosition()))
@@ -171,7 +170,6 @@ void TileEditer::HandleMouseSelection()
 				{
 					case TileEditer::UIType::TILE_TEXTURE:
 						TileSetTexture(OpenFile());
-						// selectBoxs[i]->SetTexture("graphics/UI/UI_WarningWindow_SelectBox.png");
 						break;
 					case TileEditer::UIType::ENEMY:
 						std::cout << "ENEMY" << std::endl;
@@ -201,12 +199,13 @@ void TileEditer::TileMouseSelection()
 	tilePos = sf::Vector2i((worldPos.x / tileMap->GetTileSize().x),
 		(worldPos.y / tileMap->GetTileSize().y));
 
-	tileMap->SetTileTexture(tilePos.y, tilePos.x, &tileTexture);
+	tileMap->SetTileTexture(tilePos.y, tilePos.x, tilePath);
 }
 
 void TileEditer::TileSetTexture(const std::wstring& filePath)
 {
-	tileTexture.loadFromFile(w2s(filePath));
+	tilePath = Utils::WSTRINGToString(filePath);
+	//tileTexture.loadFromFile(Utils::WSTRINGToString(filePath));
 }
 
 std::wstring TileEditer::OpenFile(const wchar_t* filter, HWND owner)
