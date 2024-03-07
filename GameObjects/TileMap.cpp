@@ -99,10 +99,9 @@ void TileMap::SetFlipY(bool flip)
 	
 }
 
-void TileMap::SetTileTexture(int y, int x, sf::Texture& t)
+void TileMap::SetTileTexture(int y, int x, sf::Texture* t)
 {
-	tiles[y][x].shape.setTexture(&t);
+	tiles[y][x].shape.setTexture(t);
 	tiles[y][x].shape.setFillColor(sf::Color::White);
-	//tiles[y][x].shape.setOutlineThickness(100.f);
 }
 

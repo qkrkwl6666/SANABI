@@ -9,10 +9,11 @@ public:
 	{
 		// 타일 표시 테두리
 		sf::RectangleShape shape;
-		sf::Texture* texture;
+		sf::Texture texture;
 		int type;
-
-		Tile(sf::Vector2f position, sf::Vector2f size, int type)
+		// 중간에 마우스로 해상도 바꾸면 아웃라이너 깨지는 에러 있음
+		// 타일 저장 및 로드 Json 파일로 
+		Tile(const sf::Vector2f& position,const sf::Vector2f& size, int type)
 		{
 			shape.setPosition(position);
 			shape.setSize(size);
@@ -57,7 +58,7 @@ public:
 	void SetFlipX(bool flip) override;
 	void SetFlipY(bool flip) override;
 
-	void SetTileTexture(int y , int x , sf::Texture& t);
+	void SetTileTexture(int y , int x , sf::Texture* t);
 	sf::Vector2f GetTileSize() { return tileSize; }
 
 

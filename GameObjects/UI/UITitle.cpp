@@ -113,6 +113,7 @@ void UITitle::SetCheck(bool c)
 
 void UITitle::HandleMouseSelection()
 {
+	// TODO : 하드코딩 변경해야함
 	for (int i = 0; i < 2; i++)
 	{
 		if (selectBoxs[i]->GetGlobalBounds().contains(mouse->GetPosition()))
@@ -121,7 +122,15 @@ void UITitle::HandleMouseSelection()
 			if (InputMgr::GetMouseButtonDown(sf::Mouse::Left))
 			{
 				// 씬 전환 타일맵의 크기 및 타일의 크기 전달
-				SCENE_MGR.ChangeScene(SceneIds::SceneTileEditer);
+				if (i == 0)
+				{
+					//SCENE_MGR.ChangeScene(SceneIds::SceneTileEditer);
+				}
+				else if (i == 1)
+				{
+					SCENE_MGR.ChangeScene(SceneIds::SceneTileEditer);
+				}
+
 			}
 			break;
 		}
