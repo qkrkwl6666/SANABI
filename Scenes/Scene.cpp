@@ -333,3 +333,13 @@ void Scene::ReSoltGo(GameObject* obj)
 {
 	sortList.push_back(obj);
 }
+
+sf::View& Scene::GetWorldView()
+{
+	return worldView;
+}
+
+sf::View& Scene::GetUiView()
+{
+	return uiView;
+}

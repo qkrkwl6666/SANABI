@@ -53,10 +53,12 @@ public:
 
 	virtual GameObject* AddGo(GameObject* obj, Layers layer = Layers::World);
 
-
 	virtual void RemoveGo(GameObject* obj);
 	virtual void DeleteGo(GameObject* obj);
 	virtual void ReSoltGo(GameObject* obj);
+
+	sf::View& GetWorldView();
+	sf::View& GetUiView();
 
 	const sf::Vector2f& GetViewCenter()
 	{

@@ -126,6 +126,26 @@ void TileEditer::Update(float dt)
 {
 	UIGo::Update(dt);
 
+	screenPos = SCENE_MGR.GetCurrentScene()->UiToScreen((sf::Vector2f)mouse->GetPosition());
+	worldPos = SCENE_MGR.GetCurrentScene()->ScreenToWorld(screenPos);
+
+	if (InputMgr::GetMouseButtonDown(sf::Mouse::Middle))
+	{
+		lastMouseWorldPos = worldPos; // 현재 마우스 위치를 저장합니다.
+	}
+
+	// 마우스 휠이 눌린 상태 유지 전에 delta랑 위치가 같지 않을때만
+	if (InputMgr::GetMouseButton(sf::Mouse::Middle) && 
+		delta != lastMouseWorldPos - worldPos) 
+	{
+		delta = lastMouseWorldPos - worldPos; // 이동량.
+
+		std::cout << delta.x << std::endl;
+		std::cout << delta.y << std::endl;
+
+		sceneTileEditer->GetWorldView().move(delta); 
+	}
+
 	// UI 배경 마우스 안에서만 Update
 	if (sprites["SelectBackground"]->GetGlobalBounds().contains(mouse->GetPosition()))
 	{

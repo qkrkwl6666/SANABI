@@ -31,6 +31,10 @@ protected:
 	sf::Vector2i screenPos;
 	sf::Vector2f worldPos;
 	sf::Vector2i tilePos;
+	sf::Vector2f lastMouseWorldPos;
+	sf::Vector2f delta;
+
+	bool isMiddle = false;
 
 public:
 	TileEditer(const std::string& name = "");

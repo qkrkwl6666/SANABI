@@ -11,7 +11,7 @@ public:
 		sf::RectangleShape shape;
 		sf::Texture texture;
 		int type;
-		// 중간에 마우스로 해상도 바꾸면 아웃라이너 깨지는 에러 있음
+		// TODO : 중간에 마우스로 해상도 바꾸면 아웃라이너 깨지는 에러 있음
 		// 타일 저장 및 로드 Json 파일로 
 		Tile(const sf::Vector2f& position,const sf::Vector2f& size, int type)
 		{

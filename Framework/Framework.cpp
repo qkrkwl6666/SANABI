@@ -68,7 +68,6 @@ void Framework::Do()
 			mouse->DebugUpdate(GetDT());
 		}
 
-
 		window.clear(sf::Color::Black);
 		SCENE_MGR.Draw(window);
 		mouse->Draw(window);
