@@ -7,11 +7,13 @@ class SceneTileEditer;
 
 class TileEditer : public UIGo
 {
+public:
 	enum class UIType
 	{
 		TILE_TEXTURE,
 		ENEMY,
 		SAVE,
+		TYPE,
 		LOAD,
 	};
 
@@ -35,6 +37,7 @@ protected:
 	sf::Vector2f delta;
 
 	bool isMiddle = false;
+	TileMap::TileType currentType;
 
 public:
 	TileEditer(const std::string& name = "");

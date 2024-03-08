@@ -4,6 +4,12 @@
 class TileMap : public GameObject
 {
 public:
+	enum class TileType
+	{
+		WALL, // 막히는 벽 갈고리 타지는벽
+		PASS, // 통과 가능한 벽 갈고리 X
+		WALLNOGRAB , // 벽 && 갈고리 X
+	};
 	struct Tile
 	{
 		// 타일 표시 테두리
@@ -11,10 +17,11 @@ public:
 		sf::Texture texture;
 		// json저장 용도 나중에 로드할때 이 경로로 각자의 타일 로드 시도해야함
 		std::string textureFilePath; 
-		int type;
+		TileType type;
 		// TODO : 중간에 마우스로 해상도 바꾸면 아웃라이너 깨지는 에러 있음
 		// 타일 저장 및 로드 Json 파일로 
-		Tile() : type(0)
+		// 타일 로드 할 때 다시 TileType로 변환
+		Tile() : type(TileType::PASS)
 		{
 
 		}
@@ -25,7 +32,7 @@ public:
 			shape.setFillColor(sf::Color::Black); // 배경색
 			shape.setOutlineThickness(0.5f); 
 			shape.setOutlineColor(sf::Color::White);
-			this->type = type;
+			this->type = (TileType)type;
 		}
 	};
 

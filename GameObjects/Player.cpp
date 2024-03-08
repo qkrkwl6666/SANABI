@@ -27,8 +27,8 @@ Player::~Player()
 
 void Player::Init()
 {
+	// TODO : 플레이어 sortLayer 하면 팅기는 현상있음 
 	SpriteGo::Init();
-
 	animator = new Animator();
 	animator->SetTarget(&sprite);
 
@@ -68,7 +68,6 @@ void Player::Reset()
 
 	/*PlayerAnimationPlay("data/Animations/Player_Idle.csv",
 		"data/Animations/Player_Arm_Idle.csv");*/
-
 	weaponAnimator = weapon->GetAnimator();
 
 	animator->Play("Player_Idle");

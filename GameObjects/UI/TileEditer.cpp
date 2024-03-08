@@ -107,15 +107,32 @@ void TileEditer::Init()
 		FRAMEWORK.GetWindowSize().y * 0.505f });
 	texts["SaveText"]->sortLayer = 6;
 
+	// ************************타입 버튼************************
+	NewSpriteGo("TypeSelect", "graphics/UI/UI_WarningWindow_SelectBox.png");
+	sprites["TypeSelect"]->SetScale({ 1.0f , 1.0f });
+	sprites["TypeSelect"]->SetOrigin(Origins::MC);
+	sprites["TypeSelect"]->SetPosition({
+		FRAMEWORK.GetWindowSize().x * 0.06f,
+		FRAMEWORK.GetWindowSize().y * 0.58f
+		});
+	sprites["TypeSelect"]->sortLayer = 6;
+
+	// ************************타입 텍스트************************
+	texts.insert({ "TypeText", new TextGo("TypeText") });
+	texts["TypeText"]->SetFont(font);
+	texts["TypeText"]->SetString(L"타입 설정");
+	texts["TypeText"]->SetCharacterSize(30);
+	texts["TypeText"]->SetColor(sf::Color::White);
+	texts["TypeText"]->SetOrigin(Origins::MC);
+	texts["TypeText"]->SetPosition({
+		FRAMEWORK.GetWindowSize().x * 0.06f,
+		FRAMEWORK.GetWindowSize().y * 0.575f });
+	texts["SaveText"]->sortLayer = 6;
+
 	selectBoxs.push_back(sprites["TextureSelect"]);
 	selectBoxs.push_back(sprites["EnemySelect"]);
 	selectBoxs.push_back(sprites["SaveSelect"]);
-
-	//const char* json[] = { "Null" };
-
-	//// ************************json 파일 실험*********************
-	//Document document;
-	//document.Parse(json);
+	selectBoxs.push_back(sprites["TypeSelect"]);
 
 	UIGo::Init();
 	ObjectsSort();
@@ -185,7 +202,7 @@ void TileEditer::HandleMouseSelection()
 	// UI 에서 월드 위치로 변환
 
 	// ui 좌표 mouse->GetPosition();
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < selectBoxs.size(); i++)
 	{
 		if (selectBoxs[i]->GetGlobalBounds().contains(mouse->GetPosition()))
 		{
@@ -202,8 +219,10 @@ void TileEditer::HandleMouseSelection()
 						break;
 					case TileEditer::UIType::SAVE:
 						tileMap->SaveTileMap("tilejson/");
-
 						std::cout << "SAVE" << std::endl;
+						break;
+					case TileEditer::UIType::TYPE:
+						std::cout << "TYPE" << std::endl;
 						break;
 					case TileEditer::UIType::LOAD:
 						std::cout << "LOAD" << std::endl;
@@ -239,24 +258,23 @@ void TileEditer::TileMouseSelection()
 void TileEditer::TileSetTexture(const std::wstring& filePath)
 {
 	tilePath = Utils::WSTRINGToString(filePath);
-	//tileTexture.loadFromFile(Utils::WSTRINGToString(filePath));
 }
 
 std::wstring TileEditer::OpenFile(const wchar_t* filter, HWND owner)
 {
-	OPENFILENAMEW ofn; // OPENFILENAME 구조체의 유니코드 버전
-	wchar_t fileName[MAX_PATH] = L""; // 파일 이름을 저장할 배열 (유니코드 문자열)
-	ZeroMemory(&ofn, sizeof(OPENFILENAMEW)); // 메모리 초기화
-	ofn.lStructSize = sizeof(OPENFILENAMEW); // 구조체 크기 설정
-	ofn.hwndOwner = owner; // 대화 상자의 부모 윈도우 핸들
+	OPENFILENAMEW ofn; 
+	wchar_t fileName[MAX_PATH] = L""; 
+	ZeroMemory(&ofn, sizeof(OPENFILENAMEW)); 
+	ofn.lStructSize = sizeof(OPENFILENAMEW); 
+	ofn.hwndOwner = owner; 
 	ofn.lpstrFilter = filter;
 	ofn.lpstrFile = fileName;
 	ofn.nMaxFile = MAX_PATH;
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	ofn.lpstrDefExt = L"";
 
-	if (GetOpenFileNameW(&ofn)) // 파일 선택 대화 상자를 엽니다. (유니코드 버전 함수 사용)
-		return fileName; // 사용자가 파일을 선택하고 "열기"를 클릭하면 파일 경로를 반환합니다.
+	if (GetOpenFileNameW(&ofn)) 
+		return fileName;
 
-	return L""; // 사용자가 취소하면 빈 문자열을 반환합니다.
+	return L"";
 }
