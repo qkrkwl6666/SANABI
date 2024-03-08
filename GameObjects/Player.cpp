@@ -47,6 +47,7 @@ void Player::Init()
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Fall_Start.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Falling.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Run_Stop.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Run_Start.csv"));
 
 	/*auto* clip = animator->GetClip("Player_Run_Landing");
 	clip->fps = 30;*/
@@ -155,6 +156,8 @@ void Player::Update(float dt)
 			weaponAnimator->Play("Player_Arm_Run_Stop");
 		}
 	}
+
+	//TODO : Player_Run_Start 실행후 > Player_Running 실행하기
 
 	else if ((animator->GetCurrentClipId() == "Player_Jumping" || 
 		animator->GetCurrentClipId() == "Player_Falling") && isGround)
