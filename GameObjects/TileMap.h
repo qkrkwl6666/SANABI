@@ -30,7 +30,7 @@ public:
 			shape.setPosition(position);
 			shape.setSize(size);
 			shape.setFillColor(sf::Color::Black); // 배경색
-			shape.setOutlineThickness(0.5f); 
+			shape.setOutlineThickness(0.6f);
 			shape.setOutlineColor(sf::Color::White);
 			this->type = (TileType)type;
 		}
@@ -42,6 +42,7 @@ protected:
 	sf::Vector2i tileMap; // 타일맵 전체 크기
 
 public:
+	TileMap(const std::string& name);
 	TileMap(const std::string& name, 
 		sf::Vector2f tileSize , sf::Vector2i tileMap);
 	~TileMap() = default;
@@ -70,10 +71,12 @@ public:
 	void SetFlipX(bool flip) override;
 	void SetFlipY(bool flip) override;
 
-	void SetTileTexture(int y , int x , const std::string& filePath);
+	void SetTileTexture(int y, int x, const std::string& filePath, const TileType& type);
 	sf::Vector2f GetTileSize() { return tileSize; }
 	sf::Vector2i GetMapSize() { return tileMap; }
 
 	void SaveTileMap(const std::string& filePath);
+	void LoadTileMap(const std::string& filePath);
+
 };
 

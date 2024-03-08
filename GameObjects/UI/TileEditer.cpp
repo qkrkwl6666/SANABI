@@ -127,12 +127,94 @@ void TileEditer::Init()
 	texts["TypeText"]->SetPosition({
 		FRAMEWORK.GetWindowSize().x * 0.06f,
 		FRAMEWORK.GetWindowSize().y * 0.575f });
-	texts["SaveText"]->sortLayer = 6;
+	texts["TypeText"]->sortLayer = 6;
+
+	// ************************타입 배경************************
+	NewSpriteGo("TypeSelectBackground", "graphics/UI/UI_Setting_BG.png");
+	sprites["TypeSelectBackground"]->SetScale({ 0.08f ,0.2f });
+	sprites["TypeSelectBackground"]->SetOrigin(Origins::MC);
+	sprites["TypeSelectBackground"]->SetPosition({
+		FRAMEWORK.GetWindowSize().x * 0.19f,
+		FRAMEWORK.GetWindowSize().y * 0.58f
+		});
+	sprites["TypeSelectBackground"]->sortLayer = 5;
+
+	// ************************타입 WALL************************
+	NewSpriteGo("TypeWall", "graphics/UI/UI_WarningWindow_SelectBox.png");
+	sprites["TypeWall"]->SetScale({ 0.8f , 0.7f });
+	sprites["TypeWall"]->SetOrigin(Origins::MC);
+	sprites["TypeWall"]->SetPosition({
+		FRAMEWORK.GetWindowSize().x * 0.19f,
+		FRAMEWORK.GetWindowSize().y * 0.51f
+		});
+	sprites["TypeWall"]->sortLayer = 6;
+
+	// ************************타입 PASS************************
+	NewSpriteGo("TypePass", "graphics/UI/UI_WarningWindow_SelectBox.png");
+	sprites["TypePass"]->SetScale({ 0.8f , 0.71f });
+	sprites["TypePass"]->SetOrigin(Origins::MC);
+	sprites["TypePass"]->SetPosition({
+		FRAMEWORK.GetWindowSize().x * 0.19f,
+		FRAMEWORK.GetWindowSize().y * 0.58f
+		});
+	sprites["TypePass"]->sortLayer = 6;
+
+	// *********************타입 WALLNOGRAB**********************
+	NewSpriteGo("TypeWallNoGrab", "graphics/UI/UI_WarningWindow_SelectBox.png");
+	sprites["TypeWallNoGrab"]->SetScale({ 0.8f , 0.7f });
+	sprites["TypeWallNoGrab"]->SetOrigin(Origins::MC);
+	sprites["TypeWallNoGrab"]->SetPosition({
+		FRAMEWORK.GetWindowSize().x * 0.19f,
+		FRAMEWORK.GetWindowSize().y * 0.65f
+		});
+	sprites["TypeWallNoGrab"]->sortLayer = 6;
+
+	// ************************타입 WALL 텍스트************************
+	texts.insert({ "WallType", new TextGo("WallType") });
+	texts["WallType"]->SetFont(font);
+	texts["WallType"]->SetString(L"WallType");
+	texts["WallType"]->SetCharacterSize(25);
+	texts["WallType"]->SetColor(sf::Color::White);
+	texts["WallType"]->SetOrigin(Origins::MC);
+	texts["WallType"]->SetPosition({
+		FRAMEWORK.GetWindowSize().x * 0.19f,
+		FRAMEWORK.GetWindowSize().y * 0.51f });
+	texts["WallType"]->sortLayer = 6;
+
+	// ************************타입 PASS 텍스트************************
+	texts.insert({ "PassType", new TextGo("PassType") });
+	texts["PassType"]->SetFont(font);
+	texts["PassType"]->SetString(L"PassType");
+	texts["PassType"]->SetCharacterSize(25);
+	texts["PassType"]->SetColor(sf::Color::White);
+	texts["PassType"]->SetOrigin(Origins::MC);
+	texts["PassType"]->SetPosition({
+		FRAMEWORK.GetWindowSize().x * 0.19f,
+		FRAMEWORK.GetWindowSize().y * 0.58f });
+	texts["PassType"]->sortLayer = 6;
+
+	// ************************타입 WALLNOGRAB 텍스트************************
+	texts.insert({ "WallNoGrabType", new TextGo("WallNoGrabType") });
+	texts["WallNoGrabType"]->SetFont(font);
+	texts["WallNoGrabType"]->SetString(L"NoGrabType");
+	texts["WallNoGrabType"]->SetCharacterSize(25);
+	texts["WallNoGrabType"]->SetColor(sf::Color::White);
+	texts["WallNoGrabType"]->SetOrigin(Origins::MC);
+	texts["WallNoGrabType"]->SetPosition({
+		FRAMEWORK.GetWindowSize().x * 0.19f,
+		FRAMEWORK.GetWindowSize().y * 0.65f });
+	texts["WallNoGrabType"]->sortLayer = 6;
 
 	selectBoxs.push_back(sprites["TextureSelect"]);
 	selectBoxs.push_back(sprites["EnemySelect"]);
 	selectBoxs.push_back(sprites["SaveSelect"]);
 	selectBoxs.push_back(sprites["TypeSelect"]);
+
+	selectTypeBoxs.push_back(sprites["TypeWall"]);
+	selectTypeBoxs.push_back(sprites["TypePass"]);
+	selectTypeBoxs.push_back(sprites["TypeWallNoGrab"]);
+
+	SetActiveTypeUI(false);
 
 	UIGo::Init();
 	ObjectsSort();
@@ -169,17 +251,25 @@ void TileEditer::Update(float dt)
 		sceneTileEditer->GetWorldView().move(delta); 
 	}
 
+	// 마우스 좌클릭 할때만 Update
+	if (InputMgr::GetMouseButtonDown(sf::Mouse::Left) && !GetActiveTypeUI())
+	{
+		TileMouseSelection();
+	}
+
 	// UI 배경 마우스 안에서만 Update
 	if (sprites["SelectBackground"]->GetGlobalBounds().contains(mouse->GetPosition()))
 	{
 		HandleMouseSelection();
 	}
-
-	// 마우스 좌클릭 할때만 Update
-	if (InputMgr::GetMouseButtonDown(sf::Mouse::Left))
+	// UI Type 배경 안에서만 Update
+	if (sprites["TypeSelectBackground"]->GetGlobalBounds().contains
+		(mouse->GetPosition()) && GetActiveTypeUI())
 	{
-		TileMouseSelection();
+		TileTypeMouseSelection();
 	}
+
+
 }
 
 void TileEditer::LateUpdate(float dt)
@@ -222,6 +312,7 @@ void TileEditer::HandleMouseSelection()
 						std::cout << "SAVE" << std::endl;
 						break;
 					case TileEditer::UIType::TYPE:
+						SetActiveTypeUI(true);
 						std::cout << "TYPE" << std::endl;
 						break;
 					case TileEditer::UIType::LOAD:
@@ -252,7 +343,7 @@ void TileEditer::TileMouseSelection()
 		return;
 	}
 
-	tileMap->SetTileTexture(tilePos.y, tilePos.x, tilePath);
+	tileMap->SetTileTexture(tilePos.y, tilePos.x, tilePath , currentType);
 }
 
 void TileEditer::TileSetTexture(const std::wstring& filePath)
@@ -277,4 +368,40 @@ std::wstring TileEditer::OpenFile(const wchar_t* filter, HWND owner)
 		return fileName;
 
 	return L"";
+}
+
+void TileEditer::TileTypeMouseSelection()
+{
+	for (int i = 0; i < selectTypeBoxs.size(); i++)
+	{
+		if (selectTypeBoxs[i]->GetGlobalBounds().contains(mouse->GetPosition()))
+		{
+			selectTypeBoxs[i]->SetTexture("graphics/UI/UI_WarningWindow_SelectBox_Selected.png");
+			if (InputMgr::GetMouseButtonDown(sf::Mouse::Left))
+			{
+				currentType = (TileMap::TileType)i;
+				SetActiveTypeUI(false);
+			}
+			break;
+		}
+		else
+		{
+			selectTypeBoxs[i]->SetTexture("graphics/UI/UI_WarningWindow_SelectBox.png");
+		}
+	}
+
+
+}
+
+void TileEditer::SetActiveTypeUI(bool active)
+{
+	isTypeUI = active;
+
+	sprites["TypeWall"]->SetActive(isTypeUI);
+	sprites["TypePass"]->SetActive(isTypeUI);
+	sprites["TypeWallNoGrab"]->SetActive(isTypeUI);
+	sprites["TypeSelectBackground"]->SetActive(isTypeUI);
+	texts["WallType"]->SetActive(isTypeUI);
+	texts["PassType"]->SetActive(isTypeUI);
+	texts["WallNoGrabType"]->SetActive(isTypeUI);
 }

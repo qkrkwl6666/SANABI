@@ -1,5 +1,6 @@
 #pragma once
 #include "UIGo.h"
+#include "TileMap.h"
 #include <Windows.h> // TODO 일단 임시로 사용
 
 class TileMap;
@@ -20,6 +21,7 @@ public:
 protected:
 	// 충돌 처리 컨테이너
 	std::vector<SpriteGo*> selectBoxs;
+	std::vector<SpriteGo*> selectTypeBoxs;
 	std::vector<SpriteGo*> checkBoxs;
 
 	SceneTileEditer* sceneTileEditer;
@@ -36,8 +38,8 @@ protected:
 	sf::Vector2f lastMouseWorldPos;
 	sf::Vector2f delta;
 
-	bool isMiddle = false;
-	TileMap::TileType currentType;
+	bool isTypeUI = false;
+	TileMap::TileType currentType = TileMap::TileType::PASS;
 
 public:
 	TileEditer(const std::string& name = "");
@@ -59,9 +61,13 @@ public:
 	void Draw(sf::RenderWindow& window) override;
 	void HandleMouseSelection(); // UI 마우스 선택
 	void TileMouseSelection(); // 타일 마우스 선택 이벤트
+	void TileTypeMouseSelection();
 	void TileSetTexture(const std::wstring& filePath);
 
 	std::wstring OpenFile(const wchar_t* filter = L"All Files (*.*)\0*.*\0", HWND owner = NULL);
 
+	void SetActiveTypeUI(bool active);
+	bool GetActiveTypeUI() const { return isTypeUI ;}
+	
 };
 

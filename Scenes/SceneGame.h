@@ -1,24 +1,23 @@
 #pragma once
 #include "Scene.h"
 
+class Player;
+class TileMap;
+
 class SceneGame : public Scene
 {
-public:
-	
-private:
-	
-
 protected:
+	Player* player = nullptr;
+	TileMap* tileMap = nullptr;
+public:
+
+	SceneGame(SceneIds id);
+	~SceneGame() override = default;
 
 	SceneGame(const SceneGame&) = delete;
 	SceneGame(SceneGame&&) = delete;
 	SceneGame& operator=(const SceneGame&) = delete;
 	SceneGame& operator=(SceneGame&&) = delete;
-
-public:
-
-	SceneGame(SceneIds id);
-	~SceneGame() override = default;
 
 	void Init() override;
 	void Release() override;
@@ -32,5 +31,8 @@ public:
 	void FixedUpdate(float dt) override;
 	void DebugUpdate(float dt) override;
 	void Draw(sf::RenderWindow& window) override;
+
+	Player* GetPlayer();
+
 };
 

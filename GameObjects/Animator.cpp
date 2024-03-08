@@ -38,6 +38,11 @@ void Animator::Stop()
 
 void Animator::Update(float dt)
 {
+	if (this == nullptr)
+	{
+		return;
+	}
+
 	// 플레이가 아닌경우에는 return
 	if (!isPlaying)
 	{

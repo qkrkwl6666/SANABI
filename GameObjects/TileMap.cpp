@@ -9,9 +9,15 @@
 #include "rapidjson/filewritestream.h" // 파일 스트림
 #include <cstdio> // C 표준 입출력 관련 함수
 #include <fstream>
+#include <sstream>
 #include <Windows.h>
 #include <commdlg.h> // 공통 대화 상자 함수를 위한 헤더
 #pragma warning(disable : 4996)
+
+TileMap::TileMap(const std::string& name) : GameObject(name)
+{
+
+}
 
 TileMap::TileMap(const std::string& name, sf::Vector2f tileSize, sf::Vector2i tileMap)
 	: GameObject(name) , tileSize(tileSize) , tileMap(tileMap)
@@ -32,7 +38,6 @@ TileMap::TileMap(const std::string& name, sf::Vector2f tileSize, sf::Vector2i ti
 void TileMap::Init()
 {
 	GameObject::Init();
-
 
 }
 
@@ -111,7 +116,7 @@ void TileMap::SetFlipY(bool flip)
 	
 }
 
-void TileMap::SetTileTexture(int y, int x, const std::string& filePath)
+void TileMap::SetTileTexture(int y, int x, const std::string& filePath ,const TileType& type)
 {
 	if (filePath == tiles[y][x].textureFilePath)
 	{
@@ -119,6 +124,7 @@ void TileMap::SetTileTexture(int y, int x, const std::string& filePath)
 		tiles[y][x].shape.setTexture(NULL);
 		tiles[y][x].shape.setFillColor(sf::Color::Black);
 		tiles[y][x].shape.setOutlineThickness(0.5f);
+		tiles[y][x].type = TileType::PASS;
 		return;
 	}
 	tiles[y][x].texture.loadFromFile(filePath);
@@ -126,6 +132,7 @@ void TileMap::SetTileTexture(int y, int x, const std::string& filePath)
 	tiles[y][x].shape.setTexture(&tiles[y][x].texture);
 	tiles[y][x].shape.setFillColor(sf::Color::White);
 	tiles[y][x].shape.setOutlineThickness(0.f);
+	tiles[y][x].type = type;
 }
 
 void TileMap::SaveTileMap(const std::string& filePath)
@@ -183,4 +190,53 @@ void TileMap::SaveTileMap(const std::string& filePath)
 	doc.Accept(writer);
 	fclose(fp);
 }
+
+void TileMap::LoadTileMap(const std::string& filePath)
+{
+	std::ifstream file(filePath);
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+	std::string contents = buffer.str();
+
+	rapidjson::Document doc;
+	if (doc.Parse(contents.c_str()).HasParseError())
+	{
+		return; // 파싱 실패 처리
+	}
+
+	tileSize.x = doc["tileSizeX"].GetFloat();
+	tileSize.y = doc["tileSizeY"].GetFloat();
+	tileMap.x = doc["mapSizeX"].GetInt();
+	tileMap.y = doc["mapSizeY"].GetInt();
+
+	const rapidjson::Value& tilesArray = doc["tiles"];
+	tiles.resize(tileMap.y, std::vector<Tile>(tileMap.x));
+
+	for (rapidjson::SizeType i = 0; i < tilesArray.Size(); i++)
+	{
+		const rapidjson::Value& tileObject = tilesArray[i];
+
+		int x = tileObject["x Pos"].GetFloat() / tileSize.x;
+		int y = tileObject["y Pos"].GetFloat() / tileSize.y;
+
+		TileType type = static_cast<TileType>(tileObject["type"].GetInt());
+		std::string textureFilePath = tileObject["texture FilePath"].GetString();
+
+		// 여기서 각 타일을 초기화합니다. 예를 들어:
+		tiles[y][x] = Tile(sf::Vector2f(x * tileSize.x, y * tileSize.y), tileSize, (int)type);
+		tiles[y][x].textureFilePath = textureFilePath;
+
+		// 텍스처 파일 경로가 있으면 텍스처 로드
+		if (!textureFilePath.empty())
+		{
+			tiles[y][x].texture.loadFromFile(textureFilePath);
+			tiles[y][x].shape.setTexture(&tiles[y][x].texture);
+			tiles[y][x].shape.setFillColor(sf::Color::White);
+		}
+		tiles[y][x].shape.setOutlineThickness(0.f);
+		
+	}
+}
+
+
 

@@ -13,7 +13,6 @@ protected:
 	SceneTitle& operator=(const SceneTitle&) = delete;
 	SceneTitle& operator=(SceneTitle&&) = delete;
 
-	Player* player = nullptr;
 	UITitle* uiTitle = nullptr;
 
 public:
@@ -25,7 +24,6 @@ public:
 	void Update(float dt) override;
 	void Enter() override;
 	void Draw(sf::RenderWindow& window) override;
-	
-	Player* GetPlayer();
+
 };
 

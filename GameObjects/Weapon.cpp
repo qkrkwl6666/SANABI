@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Weapon.h"
-#include "SceneTitle.h"
+#include "SceneGame.h"
 #include "Player.h";
 #include "Animator.h"
 
@@ -25,8 +25,8 @@ void Weapon::Init()
 	animator = new Animator();
 
 	animator->SetTarget(&sprite);
-	player = dynamic_cast<SceneTitle*>
-		(SCENE_MGR.GetScene(SceneIds::SceneTitle))->GetPlayer();
+	player = dynamic_cast<SceneGame*>
+		(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetPlayer();
 
 	SetScale({ 2.5f , 2.5f });
 	SetOrigin(Origins::MC);;

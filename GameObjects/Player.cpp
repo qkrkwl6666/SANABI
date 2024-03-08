@@ -34,8 +34,8 @@ void Player::Init()
 
 	weapon = new Weapon("Weapon");
 	SCENE_MGR.GetScene(SceneIds::SceneTitle)->AddGo(weapon);
-	// weapon->Init();
-	// weapon->Reset();
+	weapon->Init();
+	weapon->Reset();
 	SetScale({ 3.f , 3.f });
 
 	SetOrigin(Origins::MC);
@@ -68,6 +68,7 @@ void Player::Reset()
 
 	/*PlayerAnimationPlay("data/Animations/Player_Idle.csv",
 		"data/Animations/Player_Arm_Idle.csv");*/
+
 	weaponAnimator = weapon->GetAnimator();
 
 	animator->Play("Player_Idle");

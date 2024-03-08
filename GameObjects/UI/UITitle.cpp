@@ -20,12 +20,12 @@ void UITitle::Init()
 	sf::Font& font = RES_MGR_FONT.Get("fonts/NotoSansKR-Regular.otf");
 
 	// *************************로고*************************
-	NewSpriteGo("Logo", "graphics/UI/Spr_LogoWithBG_KOR.png");
-	sprites["Logo"]->SetOrigin(Origins::MC);
-	sprites["Logo"]->SetPosition({ FRAMEWORK.GetWindowSize().x *
-		0.5f , FRAMEWORK.GetWindowSize().y * 0.2f, });
-	sprites["Logo"]->SetScale({ 0.5f , 0.5f });
-	sprites["Logo"]->sortLayer = 3;
+	NewSpriteGo("MainBG", "graphics/UI/Spr_MainTitle_LightOn.png");
+	sprites["MainBG"]->SetOrigin(Origins::MC);
+	sprites["MainBG"]->SetPosition({ FRAMEWORK.GetWindowSize().x *
+		0.5f , FRAMEWORK.GetWindowSize().y * 0.5f, });
+	sprites["MainBG"]->SetScale({ 1.0f , 1.0f });
+	sprites["MainBG"]->sortLayer = 1;
 
 	// *************************배경*************************
 	NewSpriteGo("BG", "graphics/UI/UI_MainScene_BG.png");
@@ -124,7 +124,7 @@ void UITitle::HandleMouseSelection()
 				// 씬 전환 타일맵의 크기 및 타일의 크기 전달
 				if (i == 0)
 				{
-					// 게임 씬
+					SCENE_MGR.ChangeScene(SceneIds::SceneGame);
 				}
 				else if (i == 1)
 				{
