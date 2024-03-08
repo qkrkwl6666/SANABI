@@ -53,4 +53,7 @@ public:
 
 	// WSTRING to STRING
 	static std::string WSTRINGToString(const std::wstring& var);
+
+	// Windows.h
+	static std::wstring OpenSaveFileDialog();
 };

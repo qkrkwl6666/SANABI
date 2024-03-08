@@ -7,6 +7,9 @@
 #include "TextGo.h"
 #include <Windows.h>
 #include <commdlg.h> 
+#include "rapidjson/document.h"
+
+using namespace rapidjson;
 
 TileEditer::TileEditer(const std::string& name) : UIGo(name)
 {
@@ -108,6 +111,12 @@ void TileEditer::Init()
 	selectBoxs.push_back(sprites["EnemySelect"]);
 	selectBoxs.push_back(sprites["SaveSelect"]);
 
+	//const char* json[] = { "Null" };
+
+	//// ************************json 파일 실험*********************
+	//Document document;
+	//document.Parse(json);
+
 	UIGo::Init();
 	ObjectsSort();
 }
@@ -192,6 +201,8 @@ void TileEditer::HandleMouseSelection()
 						std::cout << "ENEMY" << std::endl;
 						break;
 					case TileEditer::UIType::SAVE:
+						tileMap->SaveTileMap("tilejson/");
+
 						std::cout << "SAVE" << std::endl;
 						break;
 					case TileEditer::UIType::LOAD:

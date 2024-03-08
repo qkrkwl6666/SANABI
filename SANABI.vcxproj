@@ -72,6 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\$(ProjectName) Bin\</OutDir>
+    <IncludePath>C:\Users\KGA\Desktop\Github\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -168,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Crosshair.h" />
+    <ClInclude Include="Framework\rapidjson.h" />
     <ClInclude Include="GameObjects\Player.h" />
     <ClInclude Include="DataTable\DataTable.h" />
     <ClInclude Include="Framework\Defines.h" />

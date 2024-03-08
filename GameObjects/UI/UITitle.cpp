@@ -114,7 +114,7 @@ void UITitle::SetCheck(bool c)
 void UITitle::HandleMouseSelection()
 {
 	// TODO : 하드코딩 변경해야함
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < selectBoxs.size(); i++)
 	{
 		if (selectBoxs[i]->GetGlobalBounds().contains(mouse->GetPosition()))
 		{
@@ -124,7 +124,7 @@ void UITitle::HandleMouseSelection()
 				// 씬 전환 타일맵의 크기 및 타일의 크기 전달
 				if (i == 0)
 				{
-					//SCENE_MGR.ChangeScene(SceneIds::SceneTileEditer);
+					// 게임 씬
 				}
 				else if (i == 1)
 				{

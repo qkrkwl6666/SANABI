@@ -1,7 +1,6 @@
 #pragma once
 #include "GameObject.h"
 
-
 class TileMap : public GameObject
 {
 public:
@@ -10,9 +9,15 @@ public:
 		// 타일 표시 테두리
 		sf::RectangleShape shape;
 		sf::Texture texture;
+		// json저장 용도 나중에 로드할때 이 경로로 각자의 타일 로드 시도해야함
+		std::string textureFilePath; 
 		int type;
 		// TODO : 중간에 마우스로 해상도 바꾸면 아웃라이너 깨지는 에러 있음
 		// 타일 저장 및 로드 Json 파일로 
+		Tile() : type(0)
+		{
+
+		}
 		Tile(const sf::Vector2f& position,const sf::Vector2f& size, int type)
 		{
 			shape.setPosition(position);
@@ -62,6 +67,6 @@ public:
 	sf::Vector2f GetTileSize() { return tileSize; }
 	sf::Vector2i GetMapSize() { return tileMap; }
 
-
+	void SaveTileMap(const std::string& filePath);
 };
 
