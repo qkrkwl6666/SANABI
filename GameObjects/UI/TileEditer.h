@@ -30,7 +30,7 @@ protected:
 	sf::Vector2f tileSize;
 	sf::Vector2i mapSize;
 
-	sf::String tilePath = "tileset/Spr_Stage1_Tileset_0.png";
+	std::string tilePath = "tileset/Spr_Stage1_Tileset_1.png";
 
 	sf::Vector2i screenPos;
 	sf::Vector2f worldPos;
@@ -62,12 +62,15 @@ public:
 	void HandleMouseSelection(); // UI 마우스 선택
 	void TileMouseSelection(); // 타일 마우스 선택 이벤트
 	void TileTypeMouseSelection();
-	void TileSetTexture(const std::wstring& filePath);
+	void TileSetTexture(const std::string& filePath);
 
 	std::wstring OpenFile(const wchar_t* filter = L"All Files (*.*)\0*.*\0", HWND owner = NULL);
 
 	void SetActiveTypeUI(bool active);
 	bool GetActiveTypeUI() const { return isTypeUI ;}
+
+	// 절대 경로 제거 wstring to string
+	std::string convertToRelativePath(const std::wstring& absolutePathW);
 	
 };
 

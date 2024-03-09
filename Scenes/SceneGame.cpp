@@ -16,7 +16,7 @@ void SceneGame::Init()
 	player = new Player("Player");
 	tileMap = new TileMap("TileMap");
 
-	tileMap->LoadTileMap("tilejson/floor.json");
+	tileMap->LoadTileMap("tilejson/tiletest.json");
 
 	tileMap->sortLayer = -1;
 

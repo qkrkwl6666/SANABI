@@ -378,6 +378,24 @@ std::string Utils::WSTRINGToString(const std::wstring& var)
 	return std::wstring_convert<std::remove_reference<decltype(facet)>::type, wchar_t>(&facet).to_bytes(var);
 }
 
+std::string Utils::ConvertToRelativePath(const std::string& absolutePathW)
+{
+	//백슬래시를 슬래시로 변환
+	std::string absolutePath = absolutePathW;
+
+	std::replace(absolutePath.begin(), absolutePath.end(), '\\', '/');
+
+	auto pos = absolutePath.find("tileset/");
+
+	if (pos != std::string::npos)
+	{
+		// 'tileset'을 포함한 경로의 나머지 부분을 반환
+		return absolutePath.substr(pos);
+	}
+
+	return absolutePathW; // 'tileset'이 없는 경우 원본 경로 반환
+}
+
 std::wstring Utils::OpenSaveFileDialog()
 {
 	OPENFILENAME ofn; // OPENFILENAME 구조체

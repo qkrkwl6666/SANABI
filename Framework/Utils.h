@@ -54,6 +54,8 @@ public:
 	// WSTRING to STRING
 	static std::string WSTRINGToString(const std::wstring& var);
 
+	// 절대경로 to 상대경로
+	static std::string ConvertToRelativePath(const std::string& absolutePath);
 	// Windows.h
 	static std::wstring OpenSaveFileDialog();
 };

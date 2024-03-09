@@ -118,15 +118,6 @@ void TileMap::SetFlipY(bool flip)
 
 void TileMap::SetTileTexture(int y, int x, const std::string& filePath ,const TileType& type)
 {
-	if (filePath == tiles[y][x].textureFilePath)
-	{
-		tiles[y][x].textureFilePath = "";
-		tiles[y][x].shape.setTexture(NULL);
-		tiles[y][x].shape.setFillColor(sf::Color::Black);
-		tiles[y][x].shape.setOutlineThickness(0.5f);
-		tiles[y][x].type = TileType::PASS;
-		return;
-	}
 	tiles[y][x].texture.loadFromFile(filePath);
 	tiles[y][x].textureFilePath = filePath;
 	tiles[y][x].shape.setTexture(&tiles[y][x].texture);
@@ -159,8 +150,9 @@ void TileMap::SaveTileMap(const std::string& filePath)
 			Value tileObject(kObjectType); // 개별 타일 정보를 담을 JSON 객체 생성
 			tileObject.AddMember("type", (int)tile.type, allocator); // 타일 타입 정보 추가
 			// rapidjson 은 std::string 호환이 안되서 const char* 으로 넘겨줘야함 
-			// string.c_str() 메서드 이용해서 넘겨주기
-			tileObject.AddMember("texture FilePath", rapidjson::Value(tile.textureFilePath.c_str() , allocator), allocator);
+			// TODO : 임시방편으로 상대경로로 변환뒤 저장
+			std::string relativePath = Utils::ConvertToRelativePath(tile.textureFilePath);
+			tileObject.AddMember("texture FilePath", rapidjson::Value(relativePath.c_str(), allocator), allocator);
 			tileObject.AddMember("x Pos", tile.shape.getPosition().x, allocator);
 			tileObject.AddMember("y Pos", tile.shape.getPosition().y, allocator);
 

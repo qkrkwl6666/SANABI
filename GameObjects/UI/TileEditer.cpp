@@ -302,7 +302,7 @@ void TileEditer::HandleMouseSelection()
 				switch (UIType(i))
 				{
 					case TileEditer::UIType::TILE_TEXTURE:
-						TileSetTexture(OpenFile());
+						TileSetTexture(convertToRelativePath(OpenFile()));
 						break;
 					case TileEditer::UIType::ENEMY:
 						std::cout << "ENEMY" << std::endl;
@@ -346,9 +346,9 @@ void TileEditer::TileMouseSelection()
 	tileMap->SetTileTexture(tilePos.y, tilePos.x, tilePath , currentType);
 }
 
-void TileEditer::TileSetTexture(const std::wstring& filePath)
+void TileEditer::TileSetTexture(const std::string& filePath)
 {
-	tilePath = Utils::WSTRINGToString(filePath);
+	tilePath = filePath;
 }
 
 std::wstring TileEditer::OpenFile(const wchar_t* filter, HWND owner)
@@ -367,7 +367,7 @@ std::wstring TileEditer::OpenFile(const wchar_t* filter, HWND owner)
 	if (GetOpenFileNameW(&ofn)) 
 		return fileName;
 
-	return L"";
+	return Utils::CP949ToWString(tilePath);
 }
 
 void TileEditer::TileTypeMouseSelection()
@@ -404,4 +404,25 @@ void TileEditer::SetActiveTypeUI(bool active)
 	texts["WallType"]->SetActive(isTypeUI);
 	texts["PassType"]->SetActive(isTypeUI);
 	texts["WallNoGrabType"]->SetActive(isTypeUI);
+}
+
+std::string TileEditer::convertToRelativePath(const std::wstring& absolutePathW)
+{
+	std::string absolutePath = Utils::WSTRINGToString(absolutePathW);
+
+	return absolutePath;
+
+	// TODO : 상대경로 에러 고쳐야함 
+	
+	// 백슬래시를 슬래시로 변환
+	//std::replace(absolutePath.begin(), absolutePath.end(), '\\', '/');
+
+	//auto pos = absolutePath.find("/tileset/");
+
+	//if (pos != std::string::npos)
+	//{
+	//	// 'tileset'을 포함한 경로의 나머지 부분을 반환
+	//	return absolutePath.substr(pos);
+	//}
+	//return absolutePath; // 'tileset'이 없는 경우 원본 경로 반환
 }
