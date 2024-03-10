@@ -45,7 +45,6 @@ protected:
 	float theta = 0.f;
 	float dampingFactor = 0.88f; // 감쇠율
 	float lastAngle = 0.f;
-	float angle = 180.f;
 
 	int swingDirection = 0; // 스윙 방향: -1(왼쪽), 1(오른쪽), 0(정지)
 public:
@@ -124,7 +123,6 @@ public:
 		};
 		return newPos;
 	}
-
 
 };
 

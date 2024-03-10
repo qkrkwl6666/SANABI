@@ -307,14 +307,10 @@ void Player::HandleRopeSwing(float dt)
 		sf::Vector2i closestTile = FindClosestTile();
 		if (closestTile != sf::Vector2i(-1, -1))
 		{
-			sf::Vector2f potentialRopeAnchorPoint = sf::Vector2f(closestTile.x * tileMap->GetTileSize().x, closestTile.y * tileMap->GetTileSize().y);
+			StartSwing(closestTile);
+			// 스윙 시작 시 초기 velocity.y 값을 설정
 
-			// 로프가 캐릭터보다 위에 있을 때만 스윙을 시작합니다.
-			if (potentialRopeAnchorPoint.y < GetPosition().y)
-			{
-				StartSwing(closestTile);
-				velocity.y = std::max(velocity.y, -300.f); // 스윙 시작 시 초기 상승력을 부여
-			}
+			velocity.y = std::max(velocity.y, -300.f); // 스윙 시작 시 초기 상승력을 부여
 		}
 	}
 
@@ -370,8 +366,6 @@ void Player::StartSwing(sf::Vector2i tilePosition)
 	ropeLength = Utils::Distance(GetPosition(), ropeAnchorPoint); // 로프 길이 초기화
 	swingAcceleration = initialSwingAcceleration; // 스윙 가속도 초기화
 	swingDirection = 0; // 스윙 방향 초기화
-
-	angularVelocity = velocity.x / ropeLength;
 }
 
 sf::Vector2i Player::FindClosestTile()
@@ -431,23 +425,28 @@ void Player::HandleSwingMotion(float dt, float speedFactor)
 
 void Player::UpdateSwing(float dt)
 {
-	// 로프에 매달리지 않으면 아무것도 하지 않습니다.
 	if (!isSwinging) return;
 
-	// 중력에 의한 각 가속도를 계산합니다. (단순화된 식)
-	float angularAcceleration = -gravity / ropeLength * sin(angle);
+	sf::Vector2f anchorToPoint = GetPosition() - ropeAnchorPoint;
+	float angle = atan2(anchorToPoint.y, anchorToPoint.x);
 
-	// 각속도를 업데이트합니다.
-	angularVelocity += angularAcceleration * dt;
+	// 플레이어 입력에 따른 스윙 가속도 조절
+	if (InputMgr::GetKeyDown(sf::Keyboard::A))
+	{
+		swingAcceleration -= swingForce * dt; // 왼쪽으로 스윙 가속
+		swingDirection = -1;
+	}
+	else if (InputMgr::GetKeyDown(sf::Keyboard::D))
+	{
+		swingAcceleration += swingForce * dt; // 오른쪽으로 스윙 가속
+		swingDirection = 1;
+	}
 
-	// 각도를 업데이트합니다. (로프의 다른 쪽 끝에서 시작하므로 M_PI를 더함)
-	angle += -angularVelocity * dt;
+	// 스윙 방향에 따라 위치 업데이트
+	float swingSpeed = swingAcceleration * swingDirection;
+	sf::Vector2f movement = Utils::GetNormalize(anchorToPoint) * swingSpeed * dt;
+	SetPosition(GetPosition() + movement);
 
-	// 캐릭터의 새 위치를 계산합니다.
-	sf::Vector2f newPosition = ropeAnchorPoint + ropeLength * sf::Vector2f(sin(angle), -cos(angle));
-
-	// 캐릭터의 새 위치를 설정합니다.
-	SetPosition(newPosition);
-
-	// 힘이 너무 강해져서 캐릭터가 로프를 돌면 이를 처리합니다. (예: angularVelocity를 제한)
+	// 감쇠 적용
+	swingAcceleration *= dampingFactor;
 }
