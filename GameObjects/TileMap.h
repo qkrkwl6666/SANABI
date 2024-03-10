@@ -10,6 +10,7 @@ public:
 		PASS, // 통과 가능한 벽 갈고리 X
 		WALLNOGRAB , // 벽 && 갈고리 X
 	};
+
 	struct Tile
 	{
 		// 타일 표시 테두리
@@ -74,6 +75,11 @@ public:
 	void SetTileTexture(int y, int x, const std::string& filePath, const TileType& type);
 	sf::Vector2f GetTileSize() { return tileSize; }
 	sf::Vector2i GetMapSize() { return tileMap; }
+
+	const std::vector<std::vector<Tile>>& GetTiles()
+	{
+		return tiles;
+	}
 
 	void SaveTileMap(const std::string& filePath);
 	void LoadTileMap(const std::string& filePath);

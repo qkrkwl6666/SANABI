@@ -65,7 +65,6 @@ public:
 		return worldView.getCenter();
 	}
 
-
 	Scene(const Scene&) = delete;
 	Scene(Scene&&) = delete;
 	Scene& operator=(const Scene&) = delete;
