@@ -9,7 +9,6 @@ class SceneGame : public Scene
 protected:
 	Player* player = nullptr;
 	TileMap* tileMap = nullptr;
-
 public:
 
 	SceneGame(SceneIds id);
@@ -34,7 +33,6 @@ public:
 	void Draw(sf::RenderWindow& window) override;
 
 	Player* GetPlayer();
-	TileMap* GetTileMap();
 
 };
 

@@ -56,12 +56,6 @@ void Weapon::Update(float dt)
 	animator->Update(dt);
 }
 
-void Weapon::Draw(sf::RenderWindow& window)
-{
-
-	SpriteGo::Draw(window);
-}
-
 Animator* Weapon::GetAnimator()
 {
 	if (animator != nullptr)

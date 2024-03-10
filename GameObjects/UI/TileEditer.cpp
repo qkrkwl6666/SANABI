@@ -205,33 +205,10 @@ void TileEditer::Init()
 		FRAMEWORK.GetWindowSize().y * 0.65f });
 	texts["WallNoGrabType"]->sortLayer = 6;
 
-	// ************************로드 버튼************************
-	NewSpriteGo("LoadSelect", "graphics/UI/UI_WarningWindow_SelectBox.png");
-	sprites["LoadSelect"]->SetScale({ 1.0f , 1.0f });
-	sprites["LoadSelect"]->SetOrigin(Origins::MC);
-	sprites["LoadSelect"]->SetPosition({
-		FRAMEWORK.GetWindowSize().x * 0.06f,
-		FRAMEWORK.GetWindowSize().y * 0.65f
-		});
-	sprites["LoadSelect"]->sortLayer = 6;
-
-	// ************************로드 텍스트************************
-	texts.insert({ "LoadText", new TextGo("LoadText") });
-	texts["LoadText"]->SetFont(font);
-	texts["LoadText"]->SetString(L"불러오기");
-	texts["LoadText"]->SetCharacterSize(30);
-	texts["LoadText"]->SetColor(sf::Color::White);
-	texts["LoadText"]->SetOrigin(Origins::MC);
-	texts["LoadText"]->SetPosition({
-		FRAMEWORK.GetWindowSize().x * 0.06f,
-		FRAMEWORK.GetWindowSize().y * 0.645f });
-	texts["LoadText"]->sortLayer = 6;
-
 	selectBoxs.push_back(sprites["TextureSelect"]);
 	selectBoxs.push_back(sprites["EnemySelect"]);
 	selectBoxs.push_back(sprites["SaveSelect"]);
 	selectBoxs.push_back(sprites["TypeSelect"]);
-	selectBoxs.push_back(sprites["LoadSelect"]);
 
 	selectTypeBoxs.push_back(sprites["TypeWall"]);
 	selectTypeBoxs.push_back(sprites["TypePass"]);
@@ -339,7 +316,6 @@ void TileEditer::HandleMouseSelection()
 						std::cout << "TYPE" << std::endl;
 						break;
 					case TileEditer::UIType::LOAD:
-						tileMap->LoadTileMap(convertToRelativePath(OpenFile()));
 						std::cout << "LOAD" << std::endl;
 						break;
 				}

@@ -30,7 +30,7 @@ TileMap::TileMap(const std::string& name, sf::Vector2f tileSize, sf::Vector2i ti
 		{
 			// 각 타일의 실제 위치 계산
 			sf::Vector2f tilePosition(x * tileSize.x, y * tileSize.y);
-			tiles[y][x] = Tile(tilePosition, tileSize, 1); // PASS
+			tiles[y][x] = Tile(tilePosition, tileSize, 0);
 		}
 	}
 }
@@ -226,7 +226,9 @@ void TileMap::LoadTileMap(const std::string& filePath)
 			tiles[y][x].shape.setFillColor(sf::Color::White);
 		}
 		tiles[y][x].shape.setOutlineThickness(0.f);
+		
 	}
 }
+
 
 
