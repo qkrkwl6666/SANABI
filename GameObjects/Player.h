@@ -16,6 +16,7 @@ protected:
 	Crosshair* mouse = FRAMEWORK.GetMouse();
 
 	sf::Vector2f WeaponPoint;
+
 	float gravity = 800.f;
 	float speed = 500.f;
 	sf::Vector2f velocity; // 속도 // 방향 * speed
@@ -24,8 +25,10 @@ protected:
 	bool isJumping = false;
 
 	bool isSwinging = false;
+	bool isSwingingAnimation = false;
+	bool isShiftRolling = false;
 
-	float swingForce = 5000.f;
+	float swingForce = 10000.f;
 	float maxSwingAngle = 3.14f / 3;
 
 	sf::Vector2f ropeAnchorPoint;
@@ -34,10 +37,14 @@ protected:
 	sf::Vector2i ScreenPos;
 	sf::Vector2f worldPos;
 
+	bool isShift = false;
+	float isShiftDt = 1.f;
+	float deltatime = 0.f;
+
 	float swingAcceleration = 500.f;
 
 	float angularVelocity = 90.f; // 각속도 초기화
-
+	float gravityEffect = 0.f;
 	float initialSwingAcceleration = 10.f;
 	float maxAngularVelocity = 5.2f; // 허용할 최대 각속도
 	float minAngularVelocity = 2.1f;
@@ -45,8 +52,9 @@ protected:
 	float theta = 0.f;
 	float dampingFactor = 0.88f; // 감쇠율
 	float lastAngle = 0.f;
-
+	float speedFactor = 0.f;
 	int swingDirection = 0; // 스윙 방향: -1(왼쪽), 1(오른쪽), 0(정지)
+
 public:
 	Player(const std::string& name = "");
 	~Player() override;
@@ -63,7 +71,7 @@ public:
 	void PlayerAnimationPlay(const std::string& player,
 		const std::string& weapon, bool clearQueue = true);
 
-	void PlayerFalling();
+	void PlayerShiftRolling();
 	void PlayerJumping();
 	void Delete();
 
@@ -74,6 +82,7 @@ public:
 	void StartSwing(sf::Vector2i tilePosition);
 
 	bool IsSwinging() {return isSwinging;}
+
 	sf::Vector2i FindClosestTile();
 
 	void HandleSwingMotion(float dt, float speedFactor);

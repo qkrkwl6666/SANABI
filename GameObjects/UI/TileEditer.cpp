@@ -31,7 +31,7 @@ void TileEditer::Init()
 	tileMap = sceneTileEditer->GetTitleMap();
 	//tilePath = "tileset/Spr_Stage1_Tileset_0.png";
 	//tileTexture.loadFromFile("tileset/Spr_Stage1_Tileset_0.png");
-
+	// 
 	// *************************선택 배경*************************
 	NewSpriteGo("SelectBackground", "graphics/UI/UI_Setting_BG.png");
 	sprites["SelectBackground"]->SetScale({ 0.1f ,0.3f });
@@ -239,6 +239,8 @@ void TileEditer::Init()
 
 	SetActiveTypeUI(false);
 
+	Reset();
+
 	UIGo::Init();
 	ObjectsSort();
 }
@@ -246,11 +248,39 @@ void TileEditer::Init()
 void TileEditer::Release()
 {
 	UIGo::Release();
+
+	for (int y = 0; y < tileMap->GetMapSize().y; y++)
+	{
+		for (int x = 0; x < tileMap->GetMapSize().y; x++)
+		{
+			if (typeTexts[y][x] != nullptr)
+			{
+				delete typeTexts[y][x];
+			}
+		}
+	}
 }
 
 void TileEditer::Reset()
 {
 	UIGo::Reset();
+
+	//typeTexts.clear();
+
+	//typeTexts.resize(tileMap->GetMapSize().y, std::vector<TextGo*>(tileMap->GetMapSize().x));
+
+	//for (int y = 0; y < tileMap->GetMapSize().y; y++)
+	//{
+	//	for (int x = 0; x < tileMap->GetMapSize().y; x++)
+	//	{
+	//		typeTexts[y][x] = new TextGo();
+	//		typeTexts[y][x]->SetCharacterSize(20);
+	//		typeTexts[y][x]->SetString(std::to_string((int)tileMap->GetTiles()[y][x].type));
+	//		typeTexts[y][x]->SetOrigin(Origins::MC);
+	//		typeTexts[y][x]->SetPosition(tileMap->GetTiles()[y][x].shape.getPosition());
+	//	}
+	//}
+
 }
 
 void TileEditer::Update(float dt)
@@ -308,6 +338,14 @@ void TileEditer::SetCheck(bool c)
 void TileEditer::Draw(sf::RenderWindow& window)
 {
 	UIGo::Draw(window);
+
+	//for (int y = 0; y < tileMap->GetMapSize().y; y++)
+	//{
+	//	for (int x = 0; x < tileMap->GetMapSize().y; x++)
+	//	{
+	//		typeTexts[y][x]->Draw(window);
+	//	}
+	//}
 }
 
 void TileEditer::HandleMouseSelection()
@@ -339,7 +377,14 @@ void TileEditer::HandleMouseSelection()
 						std::cout << "TYPE" << std::endl;
 						break;
 					case TileEditer::UIType::LOAD:
-						tileMap->LoadTileMap(convertToRelativePath(OpenFile()));
+						TCHAR str_currentPath[1024];
+
+						GetCurrentDirectory(1024, str_currentPath);
+
+						std::cout << str_currentPath << std::endl;
+
+						tileMap->LoadTileMap(convertToRelativePath(OpenFile()) , 0.5f);
+						//tileMap->LoadTileMap("tilejson/t1.json" , 0.5f);
 						std::cout << "LOAD" << std::endl;
 						break;
 				}

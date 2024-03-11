@@ -21,6 +21,7 @@ protected:
 
 	SceneIds startScene = SceneIds::SceneTitle;
 	SceneIds currentScene = startScene;
+	SceneIds nextScene = SceneIds::None;
 
 	SceneMgr() = default;
 	virtual ~SceneMgr();
@@ -34,7 +35,7 @@ public:
 	Scene* GetCurrentScene() { return scenes[(int)currentScene]; }
 	Scene* GetScene(SceneIds id) { return scenes[(int)id]; }
 
-	void Update(float dt);
+	bool Update(float dt);
 	void LateUpdate(float dt);
 	void FixedUpdate(float dt);
 	void DebugUpdate(float dt);

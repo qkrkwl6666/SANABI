@@ -27,7 +27,7 @@ void Weapon::Init()
 	animator->SetTarget(&sprite);
 	player = dynamic_cast<SceneGame*>
 		(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetPlayer();
-
+	
 	SetScale({ 2.5f , 2.5f });
 	SetOrigin(Origins::MC);;
 
@@ -36,6 +36,10 @@ void Weapon::Init()
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Arm_Jumping.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Arm_Falling.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Arm_Run_Stop.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Arm_Ceiling_Stick_Idle.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Arm_Ceiling_Stick_Moving.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Arm_Shift_Rolling.csv"));
+
 }
 
 void Weapon::Reset()
@@ -54,11 +58,11 @@ void Weapon::Update(float dt)
 	SpriteGo::Update(dt);
 
 	animator->Update(dt);
+
 }
 
 void Weapon::Draw(sf::RenderWindow& window)
 {
-
 	SpriteGo::Draw(window);
 }
 

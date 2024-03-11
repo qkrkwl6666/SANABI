@@ -8,10 +8,10 @@ public:
 	TextGo(const std::string& name = "");
 	TextGo(Scene* sc, const std::string& name = "");
 	~TextGo() override = default;
-	TextGo(const TextGo&) = delete;
-	TextGo(TextGo&&) = delete;
-	TextGo& operator=(const TextGo&) = delete;
-	TextGo& operator=(TextGo&&) = delete;
+	//TextGo(const TextGo&) = delete;
+	//TextGo(TextGo&&) = delete;
+	//TextGo& operator=(const TextGo&) = delete;
+	//TextGo& operator=(TextGo&&) = delete;
 
 	void SetString(const std::string& str);
 	void SetString(const std::wstring& str);

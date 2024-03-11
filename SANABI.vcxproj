@@ -111,6 +111,7 @@
       <AdditionalIncludeDirectories>.\;.\DataTable;.\GameObjects;.\GameObjects\UI;.\GameObjects\Base;.\Framework;.\Framework\Manager;.\Scenes;.\SFML-2.6.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

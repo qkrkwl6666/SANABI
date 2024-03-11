@@ -10,6 +10,7 @@ protected:
 	Animator* animator = nullptr;
 	Player* player = nullptr;
 
+
 public:
 	Weapon(const std::string& name = "");
 	~Weapon() override;

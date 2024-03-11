@@ -48,14 +48,17 @@ void Framework::Do()
 			InputMgr::UpdateEvent(event);
 		}
 		InputMgr::Update(GetDT());
-		SOUND_MGR.Update(GetDT());
 
-		SCENE_MGR.Update(GetDT());
 		mouse->Update(GetDT());
 
-		SCENE_MGR.LateUpdate(GetDT());
-		mouse->LateUpdate(GetDT());
-
+		if (SCENE_MGR.Update(GetDT()))
+		{
+			SOUND_MGR.Update(GetDT());
+			SCENE_MGR.LateUpdate(GetDT());
+			mouse->Update(GetDT());
+			mouse->LateUpdate(GetDT());
+		}
+			
 		if (fixedDeltaTime.asSeconds() >= fixedInterval)
 		{
 			SCENE_MGR.FixedUpdate(fixedDeltaTime.asSeconds());

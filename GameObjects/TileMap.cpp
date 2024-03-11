@@ -12,6 +12,7 @@
 #include <sstream>
 #include <Windows.h>
 #include <commdlg.h> // 공통 대화 상자 함수를 위한 헤더
+
 #pragma warning(disable : 4996)
 
 TileMap::TileMap(const std::string& name) : GameObject(name)
@@ -33,11 +34,14 @@ TileMap::TileMap(const std::string& name, sf::Vector2f tileSize, sf::Vector2i ti
 			tiles[y][x] = Tile(tilePosition, tileSize, 1); // PASS
 		}
 	}
+
+	GetCurrentDirectory(MAX_PATH, currentDirectory);
 }
 
 void TileMap::Init()
 {
 	GameObject::Init();
+
 
 }
 
@@ -183,7 +187,7 @@ void TileMap::SaveTileMap(const std::string& filePath)
 	fclose(fp);
 }
 
-void TileMap::LoadTileMap(const std::string& filePath)
+void TileMap::LoadTileMap(const std::string& filePath ,const float setOutlineThickness)
 {
 	std::ifstream file(filePath);
 	std::stringstream buffer;
@@ -204,6 +208,8 @@ void TileMap::LoadTileMap(const std::string& filePath)
 	const rapidjson::Value& tilesArray = doc["tiles"];
 	tiles.resize(tileMap.y, std::vector<Tile>(tileMap.x));
 
+	SetCurrentDirectory(currentDirectory);
+
 	for (rapidjson::SizeType i = 0; i < tilesArray.Size(); i++)
 	{
 		const rapidjson::Value& tileObject = tilesArray[i];
@@ -214,6 +220,12 @@ void TileMap::LoadTileMap(const std::string& filePath)
 		TileType type = static_cast<TileType>(tileObject["type"].GetInt());
 		std::string textureFilePath = tileObject["texture FilePath"].GetString();
 
+		//TCHAR str_currentPath[1024];
+
+		//GetCurrentDirectory(1024, str_currentPath);
+
+		//std::cout << str_currentPath << std::endl;
+
 		// 여기서 각 타일을 초기화합니다. 예를 들어:
 		tiles[y][x] = Tile(sf::Vector2f(x * tileSize.x, y * tileSize.y), tileSize, (int)type);
 		tiles[y][x].textureFilePath = textureFilePath;
@@ -221,11 +233,18 @@ void TileMap::LoadTileMap(const std::string& filePath)
 		// 텍스처 파일 경로가 있으면 텍스처 로드
 		if (!textureFilePath.empty())
 		{
-			tiles[y][x].texture.loadFromFile(textureFilePath);
+			if (tiles[y][x].texture.loadFromFile(textureFilePath))
+			{
+				//std::cout << "Load" << std::endl;
+			}
+			else
+			{
+				std::cout << "Loadfail" << std::endl;
+			}
 			tiles[y][x].shape.setTexture(&tiles[y][x].texture);
 			tiles[y][x].shape.setFillColor(sf::Color::White);
 		}
-		tiles[y][x].shape.setOutlineThickness(0.f);
+		tiles[y][x].shape.setOutlineThickness(setOutlineThickness);
 	}
 }
 

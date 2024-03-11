@@ -37,8 +37,10 @@ void Player::Init()
 
 	weapon = new Weapon("Weapon");
 	SCENE_MGR.GetScene(SceneIds::SceneTitle)->AddGo(weapon);
+
 	weapon->Init();
 	weapon->Reset();
+
 	SetScale({ 3.f , 3.f });
 
 	SetOrigin(Origins::MC);
@@ -51,7 +53,10 @@ void Player::Init()
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Falling.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Run_Stop.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Run_Start.csv"));
-
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Ceiling_Stick_Idle.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Ceiling_Stick_Moving.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Shift_Rolling.csv"));
+	weapon->SetOrigin(Origins::MC);
 	/*auto* clip = animator->GetClip("Player_Run_Landing");
 	clip->fps = 30;*/
 	
@@ -62,9 +67,10 @@ void Player::Reset()
 {
 	animator->ClearEvent();
 
-	//std::function<void()> funcInstance = std::bind(&Player::PlayerFalling, this);
+	std::function<void()> funcInstanceShiftRolling = std::bind(&Player::PlayerShiftRolling, this);
+	animator->AddEvent("Player_Shift_Rolling", 10, funcInstanceShiftRolling);
+
 	//std::function<void()> funcInstance2 = std::bind(&Player::PlayerJumping, this);
-	//animator->AddEvent("Player_Fall_Start", 2, funcInstance);
 	//animator->AddEvent("Player_Falling", 2, funcInstance2);
 
 	//std::function<void()> funcStatic = std::bind(&Player::TestStatic);
@@ -93,6 +99,9 @@ void Player::Update(float dt)
 {
 	SpriteGo::Update(dt);
 	animator->Update(dt);
+	weapon->Update(dt);
+
+	// TODO : 무기 UPDATE 안되는 에러있음 강제 호출중
 
 	ScreenPos = SCENE_MGR.GetCurrentScene()->UiToScreen((sf::Vector2f)mouse->GetPosition());
 	worldPos = SCENE_MGR.GetCurrentScene()->ScreenToWorld((sf::Vector2i)ScreenPos);
@@ -110,10 +119,10 @@ void Player::Update(float dt)
 		velocity.y = -500.f;
 	}
 
-	//std::cout << velocity.x << std::endl;
+	//std::cout << swingAcceleration << std::endl;
 
 	// 속도에 따른 스윙 가속도 증가 로직
-	float speedFactor = std::abs(velocity.x) / speed; // 현재 속도를 최대 속도로 나눈 비율
+	speedFactor = std::abs(velocity.x) / speed; // 현재 속도를 최대 속도로 나눈 비율
 
 	if (!isSwinging)
 	{
@@ -134,6 +143,12 @@ void Player::Update(float dt)
 	if (isSwinging)
 	{
 		HandleSwingMotion(dt, speedFactor);
+
+		//if (!isSwingingAnimation)
+		//{
+		//	animator->Play("Player_Ceiling_Stick_Moving");
+		//	isSwingingAnimation = true;
+		//}
 	}
 	else
 	{
@@ -142,18 +157,20 @@ void Player::Update(float dt)
 
 	SetPosition(position);
 
-	//if (velocity.y > 100.f && !isGround && !Falling)
-	//{
-	//	animator->Play("Player_Falling");
-	//	weaponAnimator->Play("Player_Arm_Falling");
-	//	Falling = true;
-	//}
+	if (velocity.y > 100.f && !isGround && !Falling && !isSwinging && !isShiftRolling)
+	{
+		animator->Play("Player_Falling");
+		weaponAnimator->Play("Player_Arm_Falling");
+		Falling = true;
+		isSwingingAnimation = false;
+	}
 
 	//if (position.y > FRAMEWORK.GetWindowSize().y * 0.5f)
 	//{
 	//	isGround = true;
-	//	position.y = FRAMEWORK.GetWindowSize().y * 0.5f;
 	//	velocity.y = 0.f;
+	//	position.y = FRAMEWORK.GetWindowSize().y * 0.5f;
+	//	
 	//}
 
 	if (!animator->IsPlaying())
@@ -170,49 +187,65 @@ void Player::Update(float dt)
 
 	if (!weapon->GetFlipX())
 	{
-		WeaponPoint = { -30.f , -30.f };
+		WeaponPoint = { -10.f , 0.f };
 	}
 	else
 	{
-		WeaponPoint = { 30.f , - 30.f};
+		WeaponPoint = { 10.f , 0.f};
 	}
 
-	if (animator->GetCurrentClipId() == "Player_Idle")
 	{
-		if (h != 0.f)
+		if (animator->GetCurrentClipId() == "Player_Idle")
 		{
-			animator->Play("Player_Running");
-			weaponAnimator->Play("Player_Arm_Running");
+			if (h != 0.f)
+			{
+				animator->Play("Player_Running");
+				weaponAnimator->Play("Player_Arm_Running");
+			}
 		}
+
+		else if (animator->GetCurrentClipId() == "Player_Running")
+		{
+			if (h == 0.f)
+			{
+				animator->Play("Player_Run_Stop");
+				weaponAnimator->Play("Player_Arm_Run_Stop");
+			}
+		}
+
+		//TODO : Player_Run_Start 실행후 > Player_Running 실행하기
+
+		else if ((animator->GetCurrentClipId() == "Player_Jumping" || 
+					animator->GetCurrentClipId() == "Player_Falling" ||  
+					animator->GetCurrentClipId() == "Player_Ceiling_Stick_Moving") && isGround)
+		{
+			if (h == 0.f)
+			{
+				animator->Play("Player_Idle");
+				weaponAnimator->Play("Player_Arm_Idle");
+			}
+			else
+			{
+				animator->Play("Player_Running");
+				weaponAnimator->Play("Player_Arm_Running");
+			}
+			Falling = false;
+			isSwingingAnimation = false;
+			isShiftRolling = false;
+		}
+
 	}
-	else if (animator->GetCurrentClipId() == "Player_Running")
+
+	
+	if (!isSwinging)
 	{
-		if (h == 0.f)
-		{
-			animator->Play("Player_Run_Stop");
-			weaponAnimator->Play("Player_Arm_Run_Stop");
-		}
+		weapon->SetPosition(GetPosition() + WeaponPoint);
 	}
 
-	//TODO : Player_Run_Start 실행후 > Player_Running 실행하기
-
-	else if ((animator->GetCurrentClipId() == "Player_Jumping" || 
-		animator->GetCurrentClipId() == "Player_Falling") && isGround)
+	else if (isSwinging)
 	{
-		if (h == 0.f)
-		{
-			animator->Play("Player_Idle");
-			weaponAnimator->Play("Player_Arm_Idle");
-		}
-		else
-		{
-			animator->Play("Player_Running");
-			weaponAnimator->Play("Player_Arm_Running");
-		}
-		Falling = false;
+		weapon->SetPosition(ropeAnchorPoint);
 	}
-
-	weapon->SetPosition(GetPosition() + WeaponPoint);
 }
 
 void Player::LateUpdate(float dt)
@@ -249,10 +282,11 @@ void Player::PlayerAnimationPlay(const std::string& player, const std::string& w
 	weaponAnimator->Play(weapon , clearQueue);
 }
 
-void Player::PlayerFalling()
+void Player::PlayerShiftRolling()
 {
-	std::cout << "Player_Falling!!" << std::endl;
-	animator->Play("Player_Falling");
+	std::cout << "PlayerShiftRolling!!" << std::endl;
+	isShiftRolling = false;
+	//animator->Play("PlayerShiftRolling");
 }
 
 void Player::PlayerJumping()
@@ -308,6 +342,8 @@ void Player::HandleRopeSwing(float dt)
 		if (closestTile != sf::Vector2i(-1, -1))
 		{
 			StartSwing(closestTile);
+			animator->Play("Player_Ceiling_Stick_Moving");
+			weaponAnimator->Play("Player_Arm_CeilingStick_Moving");
 			// 스윙 시작 시 초기 velocity.y 값을 설정
 
 			velocity.y = std::max(velocity.y, -300.f); // 스윙 시작 시 초기 상승력을 부여
@@ -346,6 +382,26 @@ void Player::HandleRopeSwing(float dt)
 	{
 		// 스윙 종료 로직
 		isSwinging = false;
+
+		{
+			if (swingAcceleration >= 350.f && swingAcceleration <= 10000.f && !isShiftRolling)
+			{
+				animator->Play("Player_Shift_Rolling");
+				weaponAnimator->Play("Player_Arm_Shift_Rolling");
+			}
+			else if (swingAcceleration <= -350.f && swingAcceleration >= -10000.f && !isShiftRolling)
+			{
+				animator->Play("Player_Shift_Rolling");
+				weaponAnimator->Play("Player_Arm_Shift_Rolling");
+			}
+			else
+			{
+				animator->Play("Player_Falling");
+				weaponAnimator->Play("Player_Arm_Falling");
+			}
+
+		}
+
 		swingAcceleration = 0; // 스윙 중단 시 가속도 초기화
 
 		// 스윙을 풀었을 때의 velocity.y 조정

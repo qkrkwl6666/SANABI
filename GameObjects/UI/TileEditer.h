@@ -5,6 +5,7 @@
 
 class TileMap;
 class SceneTileEditer;
+class TextGo;
 
 class TileEditer : public UIGo
 {
@@ -23,6 +24,8 @@ protected:
 	std::vector<SpriteGo*> selectBoxs;
 	std::vector<SpriteGo*> selectTypeBoxs;
 	std::vector<SpriteGo*> checkBoxs;
+
+	std::vector<std::vector<TextGo*>> typeTexts;
 
 	SceneTileEditer* sceneTileEditer;
 	TileMap* tileMap;

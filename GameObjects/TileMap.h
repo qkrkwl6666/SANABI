@@ -1,6 +1,8 @@
 #pragma once
 #include "GameObject.h"
 
+
+
 class TileMap : public GameObject
 {
 public:
@@ -39,8 +41,10 @@ public:
 
 protected:
 	std::vector<std::vector<Tile>> tiles;
+
 	sf::Vector2f tileSize; // 타일의 크기
 	sf::Vector2i tileMap; // 타일맵 전체 크기
+	wchar_t currentDirectory[256];
 
 public:
 	TileMap(const std::string& name);
@@ -82,7 +86,7 @@ public:
 	}
 
 	void SaveTileMap(const std::string& filePath);
-	void LoadTileMap(const std::string& filePath);
+	void LoadTileMap(const std::string& filePath , const float setOutlineThickness);
 
 };
 
