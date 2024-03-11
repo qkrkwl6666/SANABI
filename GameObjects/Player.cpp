@@ -110,7 +110,7 @@ void Player::Update(float dt)
 		velocity.y = -500.f;
 	}
 
-	std::cout << velocity.x << std::endl;
+	//std::cout << velocity.x << std::endl;
 
 	// 속도에 따른 스윙 가속도 증가 로직
 	float speedFactor = std::abs(velocity.x) / speed; // 현재 속도를 최대 속도로 나눈 비율
