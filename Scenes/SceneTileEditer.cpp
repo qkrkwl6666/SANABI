@@ -2,6 +2,7 @@
 #include "SceneTileEditer.h"
 #include "TileMap.h"
 #include "TileEditer.h"
+#include "TextGo.h"
 
 SceneTileEditer::SceneTileEditer(SceneIds id)
 	: Scene(SceneIds::SceneTileEditer)
@@ -25,6 +26,11 @@ void SceneTileEditer::Update(float dt)
 	Scene::Update(dt);
 }
 
+void SceneTileEditer::Release()
+{
+
+}
+
 void SceneTileEditer::Enter()
 {
 	Scene::Enter();
@@ -33,4 +39,5 @@ void SceneTileEditer::Enter()
 void SceneTileEditer::Draw(sf::RenderWindow & window)
 {
 	Scene::Draw(window);
+
 }

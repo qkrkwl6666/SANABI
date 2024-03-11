@@ -3,12 +3,14 @@
 
 class TileMap;
 class TileEditer;
+class TextGo;
 
 class SceneTileEditer : public Scene
 {
 protected:
 	TileMap* tileMap;
 	TileEditer* tileEditer;
+
 
 public:
 	SceneTileEditer(const SceneTileEditer&) = delete;
@@ -23,6 +25,7 @@ public:
 
 	void Init() override;
 	void Update(float dt) override;
+	void Release() override;
 	void Enter() override;
 	void Draw(sf::RenderWindow& window) override;
 	

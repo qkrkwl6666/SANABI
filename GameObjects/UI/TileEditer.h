@@ -25,8 +25,6 @@ protected:
 	std::vector<SpriteGo*> selectTypeBoxs;
 	std::vector<SpriteGo*> checkBoxs;
 
-	std::vector<std::vector<TextGo*>> typeTexts;
-
 	SceneTileEditer* sceneTileEditer;
 	TileMap* tileMap;
 

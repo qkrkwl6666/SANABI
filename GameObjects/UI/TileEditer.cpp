@@ -248,38 +248,11 @@ void TileEditer::Init()
 void TileEditer::Release()
 {
 	UIGo::Release();
-
-	for (int y = 0; y < tileMap->GetMapSize().y; y++)
-	{
-		for (int x = 0; x < tileMap->GetMapSize().y; x++)
-		{
-			if (typeTexts[y][x] != nullptr)
-			{
-				delete typeTexts[y][x];
-			}
-		}
-	}
 }
 
 void TileEditer::Reset()
 {
 	UIGo::Reset();
-
-	//typeTexts.clear();
-
-	//typeTexts.resize(tileMap->GetMapSize().y, std::vector<TextGo*>(tileMap->GetMapSize().x));
-
-	//for (int y = 0; y < tileMap->GetMapSize().y; y++)
-	//{
-	//	for (int x = 0; x < tileMap->GetMapSize().y; x++)
-	//	{
-	//		typeTexts[y][x] = new TextGo();
-	//		typeTexts[y][x]->SetCharacterSize(20);
-	//		typeTexts[y][x]->SetString(std::to_string((int)tileMap->GetTiles()[y][x].type));
-	//		typeTexts[y][x]->SetOrigin(Origins::MC);
-	//		typeTexts[y][x]->SetPosition(tileMap->GetTiles()[y][x].shape.getPosition());
-	//	}
-	//}
 
 }
 
@@ -339,13 +312,6 @@ void TileEditer::Draw(sf::RenderWindow& window)
 {
 	UIGo::Draw(window);
 
-	//for (int y = 0; y < tileMap->GetMapSize().y; y++)
-	//{
-	//	for (int x = 0; x < tileMap->GetMapSize().y; x++)
-	//	{
-	//		typeTexts[y][x]->Draw(window);
-	//	}
-	//}
 }
 
 void TileEditer::HandleMouseSelection()
