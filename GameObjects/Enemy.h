@@ -11,6 +11,9 @@ protected:
 	float attackSpeed;
 
 public:
+	Enemy(const std::string& name = "");
+	~Enemy() override;
+
 	void Init() override;
 	void Reset() override;
 	void Update(float dt) override;

@@ -107,6 +107,8 @@ void Player::Update(float dt)
 	worldPos = SCENE_MGR.GetCurrentScene()->ScreenToWorld((sf::Vector2i)ScreenPos);
 	HandleRopeSwing(dt);
 
+	//std::cout << GetPosition().x << " " << GetPosition().y << std::endl;
+
 	//std::cout << velocity.y << std::endl;
 	//std::cout << isGround << std::endl;
 
@@ -154,11 +156,10 @@ void Player::Update(float dt)
 	}
 	else
 	{
-		//Translate(velocity * dt);
-		position += velocity * dt;
+		if(!isCollisions)
+			Translate(velocity * dt);
 	}
 	PlayerTileCollisions(dt);
-	SetPosition(position);
 
 	if (velocity.y > 100.f && !isGround && !Falling && !isSwinging && !isShiftRolling)
 	{
@@ -240,6 +241,7 @@ void Player::Update(float dt)
 	{
 		weapon->SetPosition(ropeAnchorPoint);
 	}
+	isCollisions = false;
 }
 
 void Player::LateUpdate(float dt)
@@ -313,7 +315,7 @@ bool Player::PlayerTileCollisions(float dt)
 
 		if (tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].type == TileMap::TileType::WALL)
 		{
-			if (GetPosition().y + (GetGlobalBounds().height / 2) >
+			if (GetGlobalBounds().top + GetGlobalBounds().height >
 				tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].shape.getGlobalBounds().top)
 			{
 				SetPosition({ GetPosition().x ,tileMap->GetTiles()
@@ -322,6 +324,7 @@ bool Player::PlayerTileCollisions(float dt)
 				std::cout << GetPosition().y << std::endl;
 				isGround = true;
 				velocity.y = 0.f;
+				isCollisions = true;
 				return true;
 			}
 		}
@@ -342,6 +345,7 @@ bool Player::PlayerTileCollisions(float dt)
 				SetPosition({ GetPosition().x ,tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].shape.getGlobalBounds().top
 				+ tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].shape.getGlobalBounds().height -
 					(GetGlobalBounds().height / 2) });;
+				isCollisions = true;
 				return true;
 			}
 		}
@@ -357,7 +361,8 @@ bool Player::PlayerTileCollisions(float dt)
 				SetPosition({ tileMap->GetTiles()[RightIndex.y][RightIndex.x].
 					shape.getGlobalBounds().left - (GetGlobalBounds().width / 2) ,
 					GetPosition().y });
-				return false;
+				isCollisions = true;
+				return true;
 			}
 		}
 
@@ -373,38 +378,13 @@ bool Player::PlayerTileCollisions(float dt)
 					shape.getGlobalBounds().left + tileMap->GetTiles()[LeftIndex.y][LeftIndex.x].
 					shape.getGlobalBounds().width + (GetGlobalBounds().width / 2) ,
 					GetPosition().y });
-				return false;
+				isCollisions = true;
+				return true;
 			}
 		}
 	}
 
-	//// 플레이어의 예상 바닥 위치 계산
-	//float predictedBottom = GetPosition().y + 
-	//	GetGlobalBounds().height / 2 + velocity.y * dt;
-
-	//// 바닥면 바로 아래의 타일 인덱스 계산
-	//sf::Vector2i predictedTileIndex = {
-	//	static_cast<int>(GetPosition().x / tileMap->GetTileSize().x),
-	//	static_cast<int>((predictedBottom + 1) / tileMap->GetTileSize().y)
-	//};
-
-	//// 타일 인덱스가 타일맵 범위 내에 있는지 확인
-	//if (predictedTileIndex.x >= 0 && predictedTileIndex.x < tileMap->GetMapSize().x && predictedTileIndex.y >= 0 && predictedTileIndex.y < tileMap->GetMapSize().y)
-	//{
-	//	if (tileMap->GetTiles()[predictedTileIndex.y][predictedTileIndex.x].type == TileMap::TileType::WALL
-	//		&& !isJumping)
-	//	{
-	//		// 예상 바닥 위치가 타일의 상단보다 아래에 있다면, 플레이어를 타일의 위로 올림
-	//		float tileTop = predictedTileIndex.y * tileMap->GetTileSize().y;
-	//		SetPosition({ GetPosition().x, tileTop - GetGlobalBounds().height / 2 });
-	//		velocity.y = 0;
-	//		isGround = true;
-	//	}
-	//	else
-	//	{
-	//		isGround = false;
-	//	}
-	//}
+	return false;
 }
 
 void Player::HandleRopeSwing(float dt)

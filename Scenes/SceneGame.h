@@ -3,13 +3,14 @@
 
 class Player;
 class TileMap;
+class Enemy_RifleMan;
 
 class SceneGame : public Scene
 {
 protected:
 	Player* player = nullptr;
 	TileMap* tileMap = nullptr;
-
+	Enemy_RifleMan* rifleman = nullptr;
 public:
 
 	SceneGame(SceneIds id);

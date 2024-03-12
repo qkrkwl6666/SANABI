@@ -4,6 +4,7 @@
 #include "SceneGame.h"
 #include "Player.h"
 #include "TileMap.h"
+#include "Enemy_RifleMan.h"
 
 SceneGame::SceneGame(SceneIds id) : Scene(id)
 	
@@ -15,6 +16,8 @@ void SceneGame::Init()
 {
 	player = new Player("Player");
 	tileMap = new TileMap("TileMap");
+	rifleman = new Enemy_RifleMan("rifleman");
+	rifleman->SetPosition(player->GetPosition());
 
 	tileMap->LoadTileMap("tilejson/33.json" , 0.f);
 
@@ -22,6 +25,8 @@ void SceneGame::Init()
 
 	AddGo(tileMap, Scene::World);
 	AddGo(player, Scene::World);
+	AddGo(rifleman, Scene::World);
+
 	Scene::Init();
 }
 

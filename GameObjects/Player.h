@@ -29,6 +29,8 @@ protected:
 	bool isSwingingAnimation = false;
 	bool isShiftRolling = false;
 
+	bool isCollisions = false;
+
 	float swingForce = 10000.f;
 	float maxSwingAngle = 3.14f / 3;
 
