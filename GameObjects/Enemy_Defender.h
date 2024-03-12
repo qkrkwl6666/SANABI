@@ -1,14 +1,19 @@
 #pragma once
-#include "SpriteGo.h"
-
-class Enemy : public SpriteGo
+#include "Enemy.h"
+class Enemy_Defender : public Enemy
 {
 protected:
-	Animator* animator;
-	int hp;
-	float speed;
-	int attackDamage;
-	float attackSpeed;
+	enum class Status
+	{
+		NONE,
+		IDLE,
+		DEAD,
+		ATTACK,
+		ATTACK_COOLTIME,
+		STURNED,
+		ATTACKED,
+
+	};
 
 public:
 	void Init() override;

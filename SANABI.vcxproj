@@ -138,6 +138,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Crosshair.cpp" />
+    <ClCompile Include="GameObjects\Enemy_Defender.cpp" />
     <ClCompile Include="GameObjects\Enemy.cpp" />
     <ClCompile Include="GameObjects\Player.cpp" />
     <ClCompile Include="Framework\Framework.cpp" />
@@ -171,6 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Crosshair.h" />
+    <ClInclude Include="GameObjects\Enemy_Defender.h" />
     <ClInclude Include="GameObjects\Enemy.h" />
     <ClInclude Include="Framework\rapidjson.h" />
     <ClInclude Include="GameObjects\Player.h" />

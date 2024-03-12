@@ -43,8 +43,6 @@ void Player::Init()
 
 	SetScale({ 3.f , 3.f });
 
-	SetOrigin(Origins::MC);
-
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Idle.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Running.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Jumping.csv"));
@@ -56,7 +54,9 @@ void Player::Init()
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Ceiling_Stick_Idle.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Ceiling_Stick_Moving.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Shift_Rolling.csv"));
+
 	weapon->SetOrigin(Origins::MC);
+	SetOrigin(Origins::MC);
 	/*auto* clip = animator->GetClip("Player_Run_Landing");
 	clip->fps = 30;*/
 	
