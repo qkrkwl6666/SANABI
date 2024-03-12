@@ -25,8 +25,11 @@ protected:
 	std::vector<SpriteGo*> selectTypeBoxs;
 	std::vector<SpriteGo*> checkBoxs;
 
+	std::vector<std::vector<TextGo*>> typeTexts;
 	SceneTileEditer* sceneTileEditer;
 	TileMap* tileMap;
+
+	sf::Font& font;
 
 	sf::Vector2f tileSize;
 	sf::Vector2i mapSize;
@@ -64,6 +67,9 @@ public:
 	void TileMouseSelection(); // 타일 마우스 선택 이벤트
 	void TileTypeMouseSelection();
 	void TileSetTexture(const std::string& filePath);
+
+	void typeTextSet();
+	void typeTextDelete();
 
 	std::wstring OpenFile(const wchar_t* filter = L"All Files (*.*)\0*.*\0", HWND owner = NULL);
 

@@ -28,6 +28,8 @@ public:
 	void Release() override;
 	void Enter() override;
 	void Draw(sf::RenderWindow& window) override;
+
+	//std::vector<std::vector<TextGo*>>& GetTypeTextes() { return typeTexts; }
 	
 };
 

@@ -105,8 +105,10 @@ void Player::Update(float dt)
 
 	ScreenPos = SCENE_MGR.GetCurrentScene()->UiToScreen((sf::Vector2f)mouse->GetPosition());
 	worldPos = SCENE_MGR.GetCurrentScene()->ScreenToWorld((sf::Vector2i)ScreenPos);
-
 	HandleRopeSwing(dt);
+
+	//std::cout << velocity.y << std::endl;
+	//std::cout << isGround << std::endl;
 
 	float h = InputMgr::GetAxisRaw(Axis::Horizontal); // - 1 0 1
 
@@ -152,9 +154,10 @@ void Player::Update(float dt)
 	}
 	else
 	{
+		//Translate(velocity * dt);
 		position += velocity * dt;
 	}
-
+	PlayerTileCollisions(dt);
 	SetPosition(position);
 
 	if (velocity.y > 100.f && !isGround && !Falling && !isSwinging && !isShiftRolling)
@@ -164,14 +167,6 @@ void Player::Update(float dt)
 		Falling = true;
 		isSwingingAnimation = false;
 	}
-
-	//if (position.y > FRAMEWORK.GetWindowSize().y * 0.5f)
-	//{
-	//	isGround = true;
-	//	velocity.y = 0.f;
-	//	position.y = FRAMEWORK.GetWindowSize().y * 0.5f;
-	//	
-	//}
 
 	if (!animator->IsPlaying())
 	{
@@ -236,7 +231,6 @@ void Player::Update(float dt)
 
 	}
 
-	
 	if (!isSwinging)
 	{
 		weapon->SetPosition(GetPosition() + WeaponPoint);
@@ -255,7 +249,7 @@ void Player::LateUpdate(float dt)
 	//std::cout << GetPosition().y << std::endl;
 
 	// 공중에 있는 동안에는 타일 충돌 검사 수행
-	PlayerTileCollisions(dt);
+	//PlayerTileCollisions(dt);
 
 }
 
@@ -304,33 +298,113 @@ void Player::Delete()
 	}
 }
 
-void Player::PlayerTileCollisions(float dt)
+bool Player::PlayerTileCollisions(float dt)
 {
-	// 플레이어의 예상 바닥 위치 계산
-	float predictedBottom = GetPosition().y + GetGlobalBounds().height / 2 + velocity.y * dt;
+	// 현재 플레이어 위치의 타일맵 인덱스 계산
+	sf::Vector2i tileIndex = { (int)GetPosition().x / (int)tileMap->GetTileSize().x ,
+		(int)GetPosition().y / (int)tileMap->GetTileSize().y };
 
-	// 바닥면 바로 아래의 타일 인덱스 계산
-	sf::Vector2i predictedTileIndex = {
-		static_cast<int>(GetPosition().x / tileMap->GetTileSize().x),
-		static_cast<int>((predictedBottom + 1) / tileMap->GetTileSize().y)
-	};
-
-	// 타일 인덱스가 타일맵 범위 내에 있는지 확인
-	if (predictedTileIndex.x >= 0 && predictedTileIndex.x < tileMap->GetMapSize().x && predictedTileIndex.y >= 0 && predictedTileIndex.y < tileMap->GetMapSize().y)
+	if (tileIndex.x >= 1 && tileIndex.x < tileMap->GetMapSize().x - 1 &&
+		tileIndex.y >= 1 && tileIndex.y < tileMap->GetMapSize().y - 1)
 	{
-		if (tileMap->GetTiles()[predictedTileIndex.y][predictedTileIndex.x].type == TileMap::TileType::WALL)
+		// 하단 타일
+	// 플레이어의 하단 타일
+		sf::Vector2i bottomIndex = { tileIndex.x , tileIndex.y + 1 };
+
+		if (tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].type == TileMap::TileType::WALL)
 		{
-			// 예상 바닥 위치가 타일의 상단보다 아래에 있다면, 플레이어를 타일의 위로 올림
-			float tileTop = predictedTileIndex.y * tileMap->GetTileSize().y;
-			SetPosition({ GetPosition().x, tileTop - GetGlobalBounds().height / 2 });
-			velocity.y = 0;
-			isGround = true;
+			if (GetPosition().y + (GetGlobalBounds().height / 2) >
+				tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].shape.getGlobalBounds().top)
+			{
+				SetPosition({ GetPosition().x ,tileMap->GetTiles()
+					[bottomIndex.y][bottomIndex.x].shape.getGlobalBounds().top -
+					(GetGlobalBounds().height / 2) });
+				std::cout << GetPosition().y << std::endl;
+				isGround = true;
+				velocity.y = 0.f;
+				return true;
+			}
 		}
-		else
+		else if (tileMap->GetTiles()[bottomIndex.y + 1][bottomIndex.x].type != TileMap::TileType::WALL)
 		{
 			isGround = false;
 		}
+
+		// 플레이어의 위쪽 타일
+		sf::Vector2i TopIndex = { tileIndex.x , tileIndex.y - 1 };
+
+		if (tileMap->GetTiles()[TopIndex.y][TopIndex.x].type == TileMap::TileType::WALL)
+		{
+			if (GetPosition().y + (GetGlobalBounds().height / 2) <
+				tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].shape.getGlobalBounds().top
+				+ tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].shape.getGlobalBounds().height)
+			{
+				SetPosition({ GetPosition().x ,tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].shape.getGlobalBounds().top
+				+ tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].shape.getGlobalBounds().height -
+					(GetGlobalBounds().height / 2) });;
+				return true;
+			}
+		}
+
+		// 플레이어의 오른쪽 타일
+		sf::Vector2i RightIndex = { tileIndex.x + 1 , tileIndex.y };
+
+		if (tileMap->GetTiles()[RightIndex.y][RightIndex.x].type == TileMap::TileType::WALL)
+		{
+			if (GetPosition().x + (GetGlobalBounds().width / 2) >
+				tileMap->GetTiles()[RightIndex.y][RightIndex.x].shape.getGlobalBounds().left)
+			{
+				SetPosition({ tileMap->GetTiles()[RightIndex.y][RightIndex.x].
+					shape.getGlobalBounds().left - (GetGlobalBounds().width / 2) ,
+					GetPosition().y });
+				return false;
+			}
+		}
+
+		sf::Vector2i LeftIndex = { tileIndex.x - 1 , tileIndex.y };
+
+		if (tileMap->GetTiles()[LeftIndex.y][LeftIndex.x].type == TileMap::TileType::WALL)
+		{
+			if (GetPosition().x - (GetGlobalBounds().width / 2) <
+				tileMap->GetTiles()[LeftIndex.y][LeftIndex.x].shape.getGlobalBounds().left
+				+ tileMap->GetTiles()[LeftIndex.y][LeftIndex.x].shape.getGlobalBounds().width)
+			{
+				SetPosition({ tileMap->GetTiles()[LeftIndex.y][LeftIndex.x].
+					shape.getGlobalBounds().left + tileMap->GetTiles()[LeftIndex.y][LeftIndex.x].
+					shape.getGlobalBounds().width + (GetGlobalBounds().width / 2) ,
+					GetPosition().y });
+				return false;
+			}
+		}
 	}
+
+	//// 플레이어의 예상 바닥 위치 계산
+	//float predictedBottom = GetPosition().y + 
+	//	GetGlobalBounds().height / 2 + velocity.y * dt;
+
+	//// 바닥면 바로 아래의 타일 인덱스 계산
+	//sf::Vector2i predictedTileIndex = {
+	//	static_cast<int>(GetPosition().x / tileMap->GetTileSize().x),
+	//	static_cast<int>((predictedBottom + 1) / tileMap->GetTileSize().y)
+	//};
+
+	//// 타일 인덱스가 타일맵 범위 내에 있는지 확인
+	//if (predictedTileIndex.x >= 0 && predictedTileIndex.x < tileMap->GetMapSize().x && predictedTileIndex.y >= 0 && predictedTileIndex.y < tileMap->GetMapSize().y)
+	//{
+	//	if (tileMap->GetTiles()[predictedTileIndex.y][predictedTileIndex.x].type == TileMap::TileType::WALL
+	//		&& !isJumping)
+	//	{
+	//		// 예상 바닥 위치가 타일의 상단보다 아래에 있다면, 플레이어를 타일의 위로 올림
+	//		float tileTop = predictedTileIndex.y * tileMap->GetTileSize().y;
+	//		SetPosition({ GetPosition().x, tileTop - GetGlobalBounds().height / 2 });
+	//		velocity.y = 0;
+	//		isGround = true;
+	//	}
+	//	else
+	//	{
+	//		isGround = false;
+	//	}
+	//}
 }
 
 void Player::HandleRopeSwing(float dt)

@@ -97,6 +97,7 @@ void UIGo::UiInit()
 
 void UIGo::UiDraw(sf::RenderWindow& window)
 {
+
 	for (auto data : sortSprites)
 	{
 		if (data->GetActive())

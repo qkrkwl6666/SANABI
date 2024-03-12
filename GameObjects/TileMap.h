@@ -1,6 +1,6 @@
 #pragma once
 #include "GameObject.h"
-
+#include "TextGo.h"
 
 
 class TileMap : public GameObject
@@ -24,17 +24,19 @@ public:
 		// TODO : 중간에 마우스로 해상도 바꾸면 아웃라이너 깨지는 에러 있음
 		// 타일 저장 및 로드 Json 파일로 
 		// 타일 로드 할 때 다시 TileType로 변환
+
 		Tile() : type(TileType::PASS)
 		{
 
 		}
+
 		Tile(const sf::Vector2f& position,const sf::Vector2f& size, int type)
 		{
 			shape.setPosition(position);
 			shape.setSize(size);
 			shape.setFillColor(sf::Color::Black); // 배경색
 			shape.setOutlineThickness(0.6f);
-			shape.setOutlineColor(sf::Color::White);
+			shape.setOutlineColor(sf::Color::White); // 기본 WALL 색깔
 			this->type = (TileType)type;
 		}
 	};

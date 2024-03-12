@@ -11,7 +11,8 @@
 
 using namespace rapidjson;
 
-TileEditer::TileEditer(const std::string& name) : UIGo(name)
+TileEditer::TileEditer(const std::string& name) : UIGo(name) 
+	, font(RES_MGR_FONT.Get("fonts/NotoSansKR-Regular.otf"))
 {
 	//Init();
 }
@@ -23,7 +24,6 @@ TileEditer::~TileEditer()
 
 void TileEditer::Init()
 {
-	sf::Font& font = RES_MGR_FONT.Get("fonts/NotoSansKR-Regular.otf");
 
 	sceneTileEditer = dynamic_cast<SceneTileEditer*>
 		(SCENE_MGR.GetScene(SceneIds::SceneTileEditer));
@@ -237,6 +237,8 @@ void TileEditer::Init()
 	selectTypeBoxs.push_back(sprites["TypePass"]);
 	selectTypeBoxs.push_back(sprites["TypeWallNoGrab"]);
 
+	//typeTextSet();
+
 	SetActiveTypeUI(false);
 
 	Reset();
@@ -312,6 +314,7 @@ void TileEditer::Draw(sf::RenderWindow& window)
 {
 	UIGo::Draw(window);
 
+
 }
 
 void TileEditer::HandleMouseSelection()
@@ -344,12 +347,9 @@ void TileEditer::HandleMouseSelection()
 						break;
 					case TileEditer::UIType::LOAD:
 						TCHAR str_currentPath[1024];
-
 						GetCurrentDirectory(1024, str_currentPath);
-
-						std::cout << str_currentPath << std::endl;
-
 						tileMap->LoadTileMap(convertToRelativePath(OpenFile()) , 0.5f);
+						//typeTextSet();
 						//tileMap->LoadTileMap("tilejson/t1.json" , 0.5f);
 						std::cout << "LOAD" << std::endl;
 						break;
@@ -384,6 +384,45 @@ void TileEditer::TileMouseSelection()
 void TileEditer::TileSetTexture(const std::string& filePath)
 {
 	tilePath = filePath;
+}
+
+void TileEditer::typeTextSet()
+{
+	typeTextDelete();
+
+	typeTexts.resize(tileMap->GetMapSize().y,
+		std::vector<TextGo*>(tileMap->GetMapSize().x));
+
+	for (int y = 0; y < tileMap->GetMapSize().y; ++y)
+	{
+		for (int x = 0; x < tileMap->GetMapSize().x; ++x)
+		{
+			typeTexts[y][x] = new TextGo();
+			typeTexts[y][x]->SetFont(font);
+			typeTexts[y][x]->SetString(std::to_string(
+				(int)tileMap->GetTiles()[y][x].type));
+			typeTexts[y][x]->SetCharacterSize(20);
+			typeTexts[y][x]->SetOrigin(Origins::MC);
+			typeTexts[y][x]->SetPosition(tileMap->GetTiles()[y][x].shape.getPosition());
+
+			SCENE_MGR.GetScene(SceneIds::SceneTileEditer)->
+				AddGo(typeTexts[y][x], Scene::World);
+		}
+	}
+
+}
+
+void TileEditer::typeTextDelete()
+{
+	for (auto& rows : typeTexts)
+	{
+		for (auto* texts : rows)
+		{
+			SCENE_MGR.GetScene(SceneIds::SceneTileEditer)->DeleteGo(texts);
+		}
+	}
+
+	typeTexts.clear();
 }
 
 std::wstring TileEditer::OpenFile(const wchar_t* filter, HWND owner)

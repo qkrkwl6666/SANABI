@@ -13,6 +13,7 @@ protected:
 	Animator* weaponAnimator = nullptr;
 	Weapon* weapon = nullptr;
 	TileMap* tileMap = nullptr;
+
 	Crosshair* mouse = FRAMEWORK.GetMouse();
 
 	sf::Vector2f WeaponPoint;
@@ -37,9 +38,13 @@ protected:
 	sf::Vector2i ScreenPos;
 	sf::Vector2f worldPos;
 
+	sf::Vector2f playerPos;
+
 	bool isShift = false;
 	float isShiftDt = 1.f;
 	float deltatime = 0.f;
+
+	int countt = 0;
 
 	float swingAcceleration = 500.f;
 
@@ -75,7 +80,7 @@ public:
 	void PlayerJumping();
 	void Delete();
 
-	void PlayerTileCollisions(float dt);
+	bool PlayerTileCollisions(float dt);
 
 	void HandleRopeSwing(float dt);
 

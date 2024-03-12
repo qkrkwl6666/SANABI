@@ -7,11 +7,12 @@
 SceneTileEditer::SceneTileEditer(SceneIds id)
 	: Scene(SceneIds::SceneTileEditer)
 {
-
+	
 }
 
 void SceneTileEditer::Init()
 {
+	
 	tileMap = new TileMap("TileMap" , {50.f , 50.f } , {100, 100});
 	tileEditer = new TileEditer();
 
@@ -34,10 +35,13 @@ void SceneTileEditer::Release()
 void SceneTileEditer::Enter()
 {
 	Scene::Enter();
+
+	sf::Font& font = RES_MGR_FONT.Get("fonts/NotoSansKR-Regular.otf");
+
+
 }
 
-void SceneTileEditer::Draw(sf::RenderWindow & window)
+void SceneTileEditer::Draw(sf::RenderWindow& window)
 {
 	Scene::Draw(window);
-
 }

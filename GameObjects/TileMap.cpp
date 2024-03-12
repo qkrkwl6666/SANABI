@@ -23,6 +23,7 @@ TileMap::TileMap(const std::string& name) : GameObject(name)
 TileMap::TileMap(const std::string& name, sf::Vector2f tileSize, sf::Vector2i tileMap)
 	: GameObject(name) , tileSize(tileSize) , tileMap(tileMap)
 {
+
 	tiles.resize(tileMap.y, std::vector<Tile>(tileMap.x));
 
 	for (int y = 0; y < tileMap.y; ++y)
@@ -122,12 +123,26 @@ void TileMap::SetFlipY(bool flip)
 
 void TileMap::SetTileTexture(int y, int x, const std::string& filePath ,const TileType& type)
 {
+	// TODO : texture 타일 구조체에 있는게 아니라 멤버변수로 빼기
 	tiles[y][x].texture.loadFromFile(filePath);
 	tiles[y][x].textureFilePath = filePath;
 	tiles[y][x].shape.setTexture(&tiles[y][x].texture);
 	tiles[y][x].shape.setFillColor(sf::Color::White);
-	tiles[y][x].shape.setOutlineThickness(0.f);
+	tiles[y][x].shape.setOutlineThickness(1.f);
 	tiles[y][x].type = type;
+
+	switch (tiles[y][x].type)
+	{
+		case TileType::WALL:
+			tiles[y][x].shape.setOutlineColor(sf::Color::Red);
+			break;
+		case TileType::PASS:
+			tiles[y][x].shape.setOutlineColor(sf::Color::White);
+			break;
+		case TileType::WALLNOGRAB:
+			tiles[y][x].shape.setOutlineColor(sf::Color::Blue);
+			break;
+	}
 }
 
 void TileMap::SaveTileMap(const std::string& filePath)
@@ -243,6 +258,21 @@ void TileMap::LoadTileMap(const std::string& filePath ,const float setOutlineThi
 			}
 			tiles[y][x].shape.setTexture(&tiles[y][x].texture);
 			tiles[y][x].shape.setFillColor(sf::Color::White);
+		}
+		if (setOutlineThickness > 0.1f)
+		{
+			switch (tiles[y][x].type)
+			{
+				case TileType::WALL:
+					tiles[y][x].shape.setOutlineColor(sf::Color::Red);
+					break;
+				case TileType::PASS:
+					tiles[y][x].shape.setOutlineColor(sf::Color::White);
+					break;
+				case TileType::WALLNOGRAB:
+					tiles[y][x].shape.setOutlineColor(sf::Color::Blue);
+					break;
+			}
 		}
 		tiles[y][x].shape.setOutlineThickness(setOutlineThickness);
 	}
