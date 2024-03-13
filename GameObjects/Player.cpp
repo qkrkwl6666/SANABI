@@ -252,6 +252,11 @@ void Player::LateUpdate(float dt)
 {
 	SpriteGo::LateUpdate(dt);
 
+	if (InputMgr::GetMouseButtonDown(sf::Mouse::Left))
+	{
+		//PlayerEnemysCollisions(dt);
+	}
+
 	//std::cout << GetPosition().y << std::endl;
 
 	// 공중에 있는 동안에는 타일 충돌 검사 수행
@@ -393,12 +398,48 @@ bool Player::PlayerTileCollisions(float dt)
 
 void Player::PlayerEnemysCollisions(float dt)
 {
+	sf::Vector2i closestTileIndex(-1, -1); // 초기값을 유효하지 않은 인덱스로 설정
+	//float closestDistance = std::numeric_limits<float>::max();
+
+	// 마우스 위치에 대한 타일 좌표 계산
+	int mouseTileX = static_cast<int>(worldPos.x / tileMap->GetTileSize().x);
+	int mouseTileY = static_cast<int>(worldPos.y / tileMap->GetTileSize().y);
+
+	// 마우스 위치 주변의 9개 타일을 검사
+	for (int y = mouseTileY - 1; y <= mouseTileY + 1; ++y)
+	{
+		for (int x = mouseTileX - 1; x <= mouseTileX + 1; ++x)
+		{
+			// 검사 범위가 타일맵 내에 있는지 확인
+			if (x >= 0 && x < tileMap->GetMapSize().x && y >= 0 && y < tileMap->GetMapSize().y)
+			{
+				// PASS가 아닌 타일에만 로프를 걸 수 있음
+				auto it = enemys->begin();
+				
+				while (it != enemys->end())
+				{
+					Enemy* enemy = *it;
+					if (tileMap->GetTiles()[y][x].shape.getGlobalBounds().
+							contains(enemy->GetPosition()))
+					{
+						SetPosition(enemy->GetPosition());
+						return;
+					}
+					else
+					{
+						it++;
+					}
+				}
+
+			}
+		}
+	}
 
 }
 
 void Player::HandleRopeSwing(float dt)
 {
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !isSwinging)
+	if (InputMgr::GetMouseButtonDown(sf::Mouse::Left) && !isSwinging)
 	{
 		angularVelocity = 0.0f; // 스윙 시작 시 각속도 초기화
 		sf::Vector2i closestTile = FindClosestTile();
@@ -504,6 +545,23 @@ sf::Vector2i Player::FindClosestTile()
 			// 검사 범위가 타일맵 내에 있는지 확인
 			if (x >= 0 && x < tileMap->GetMapSize().x && y >= 0 && y < tileMap->GetMapSize().y)
 			{
+				// PASS가 아닌 타일에만 로프를 걸 수 있음
+				auto it = enemys->begin();
+
+				while (it != enemys->end())
+				{
+					Enemy* enemy = *it;
+					if (tileMap->GetTiles()[y][x].shape.getGlobalBounds().
+						contains(enemy->GetPosition()))
+					{
+						SetPosition(enemy->GetPosition());
+						return closestTileIndex;
+					}
+					else
+					{
+						it++;
+					}
+				}
 				// PASS가 아닌 타일에만 로프를 걸 수 있음
 				if (tileMap->GetTiles()[y][x].type != TileMap::TileType::PASS)
 				{

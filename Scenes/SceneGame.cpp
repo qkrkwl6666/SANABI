@@ -41,11 +41,9 @@ void SceneGame::Init()
 
 	for (auto& data : enemys)
 	{
-		data->SetPosition({ 960 - fff , 1613 });
+		data->SetPosition({ 960 + fff , 1613 });
 		fff -= 200;
 	}
-
-	
 
 }
 

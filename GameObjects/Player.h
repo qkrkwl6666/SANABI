@@ -85,6 +85,7 @@ public:
 	void Delete();
 
 	bool PlayerTileCollisions(float dt);
+
 	void PlayerEnemysCollisions(float dt);
 
 	void HandleRopeSwing(float dt);
