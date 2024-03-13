@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Animator.h"
 #include "SpriteGo.h"
+#include "Bullet.h"
 
 Enemy_RifleMan::Enemy_RifleMan(const std::string& name) : Enemy(name)
 {
@@ -35,11 +36,21 @@ void Enemy_RifleMan::Init()
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Enemy_RifleMan_Ready_Shot.csv"));
 
 
+	SetTexture("graphics/Enemy/RifleMan/Spr_ENE_Rifleman_Ready2Shot.png");
+
 	SetScale({ 2.f , 2.f });
 	SetOrigin(Origins::MC);
 	SetPosition({ 960 , 1613 });
 
+	gunPoint = { 5 , -10 };
+
 	gun = new SpriteGo();
+
+	gun->SetTexture("graphics/Enemy/RifleMan/Spr_ENE_RiflemanArm_Ready2Shot.png");
+
+	gun->SetScale({ 2.f , 2.f });
+	gun->SetOrigin(Origins::BC);
+	gun->SetPosition(GetPosition() + gunPoint);
 
 	gunAnimator = new Animator();
 	gunAnimator->SetTarget(gun->GetSprite());
@@ -49,9 +60,8 @@ void Enemy_RifleMan::Init()
 	gunAnimator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Enemy_RifleMan_Arm_Shooting.csv"));
 	gunAnimator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Enemy_RifleMan_Arm_Ready_Shot.csv"));
 
-	gun->SetScale({ 2.f , 2.f });
-	gun->SetPosition(position);
-	gun->SetOrigin(Origins::MC);
+
+	bullets.resize(12, new Bullet());
 
 }
 
@@ -64,11 +74,40 @@ void Enemy_RifleMan::Update(float dt)
 {
 	Enemy::Update(dt);
 	gunAnimator->Update(dt);
-	gun->SetPosition(position);
+	
+	//std::cout << isShooting << std::endl;
+	std::cout << shootingCurrentCount << std::endl;
+	//std::cout << shootingDt << std::endl;
+	for (auto& data : bullets)
+	{
+		if (data->GetActive())
+		{
+			data->Update(dt);
+		}
 
+	}
 	playerPos = player->GetPosition() - gun->GetPosition();
 
-	gun->SetRotation(Utils::Angle(playerPos));
+	if (Utils::Angle(playerPos) >= -90 && Utils::Angle(playerPos) <= 90)
+	{
+		gunPoint = { 5.f , -10.f };
+		SetFlipX(false);
+		gun->SetFlipX(false);
+		gun->SetRotation(Utils::Angle(playerPos));
+	}
+	else if (Utils::Angle(playerPos) <= -90 && Utils::Angle(playerPos) <= 90)
+	{
+		gunPoint = { -5.f , -10.f };
+		SetFlipX(true);
+		gun->SetFlipX(true);
+		gun->SetRotation(-180 + Utils::Angle(playerPos));
+	}
+
+	if (!isShooting)
+	{
+		gun->SetPosition(GetPosition() + gunPoint);
+	}
+
 	AnimationIdle();
 
 	switch (currentStatus)
@@ -88,10 +127,10 @@ void Enemy_RifleMan::Update(float dt)
 				aimingDt = 0.f;
 				isAiming = false;
 
-				// TODO : Status Shoot 으로 바꿔야함
 				currentStatus = Status::SHOOTING;
 				animator->Play("Enemy_RifleMan_Ready_Shot");
 				gunAnimator->Play("Enemy_RifleMan_Arm_Ready_Shot");
+				playerBulletPos = Utils::GetNormalize(player->GetPosition() - GetPosition());
 			}
 			break;
 		}
@@ -101,24 +140,49 @@ void Enemy_RifleMan::Update(float dt)
 		break;
 
 	case Enemy_RifleMan::Status::SHOOTING:
+		isShooting = true;
+		shootingDt += dt;
+		gun->SetRotation(Utils::Angle(playerBulletPos));
+
+		if (Utils::Angle(playerBulletPos) <= -90 && Utils::Angle(playerBulletPos) <= 90)
+		{
+			SetFlipX(true);
+			gun->SetFlipX(true);
+			gun->SetRotation(-180 + Utils::Angle(playerBulletPos));
+		}
+
 		if (shootingCurrentCount >= shootingMaxCount)
 		{
 			shootingDt = 0.2f;
 			shootingCurrentCount = 0;
 			currentStatus = Status::IDLE;
+			isShooting = false;
 			break;
 		}
-		shootingDt += dt;
 
 		if (shootingDt >= shootingDuration)
 		{
 			// 총알 발사
+			// TODO : 총알 로직 수정해야함
 			animator->Play("Enemy_RifleMan_Shooting");
 			gunAnimator->Play("Enemy_RifleMan_Arm_Shooting");
-			shootingCurrentCount++;
-			shootingDt = 0.f;
+			auto it = bullets.begin();
+			while (it != bullets.end())
+			{
+				Bullet* bullet = dynamic_cast<Bullet*>(*it);
+				if (!bullet->GetActive())
+				{
+					bullet->Shooting(playerBulletPos, this);
+					shootingCurrentCount++;
+					shootingDt = 0.f;
+					break;
+				}
+				else
+				{
+					it++;
+				}
+			}
 		}
-
 		break;
 	case Enemy_RifleMan::Status::STUNED:
 
@@ -141,6 +205,14 @@ void Enemy_RifleMan::Draw(sf::RenderWindow& window)
 	Enemy::Draw(window);
 	gun->Draw(window);
 
+	for (auto& data : bullets)
+	{
+		if (data->GetActive())
+		{
+			data->Draw(window);
+		}
+
+	}
 }
 
 void Enemy_RifleMan::AnimationIdle()

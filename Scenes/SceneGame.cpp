@@ -16,8 +16,8 @@ void SceneGame::Init()
 {
 	player = new Player("Player");
 	tileMap = new TileMap("TileMap");
-	rifleman = new Enemy_RifleMan("rifleman");
-	rifleman->SetPosition(player->GetPosition());
+	// rifleman = new Enemy_RifleMan("rifleman");
+	// rifleman->SetPosition(player->GetPosition());
 
 	tileMap->LoadTileMap("tilejson/33.json" , 0.f);
 
@@ -25,9 +25,28 @@ void SceneGame::Init()
 
 	AddGo(tileMap, Scene::World);
 	AddGo(player, Scene::World);
-	AddGo(rifleman, Scene::World);
+	//AddGo(rifleman, Scene::World);
+
+
+	enemys.push_back(new Enemy_RifleMan());
+	enemys.push_back(new Enemy_RifleMan());
+	enemys.push_back(new Enemy_RifleMan());
+
+	for (auto& data : enemys)
+	{
+		AddGo(data, Scene::World);
+	}
 
 	Scene::Init();
+
+	for (auto& data : enemys)
+	{
+		data->SetPosition({ 960 - fff , 1613 });
+		fff -= 200;
+	}
+
+	
+
 }
 
 void SceneGame::Release()
@@ -103,4 +122,9 @@ TileMap* SceneGame::GetTileMap()
 		return tileMap;
 	}
 	std::cout << "tileMap is nullptr !!" << std::endl;
+}
+
+std::list<Enemy*>* SceneGame::GetEnemys()
+{
+	return &enemys;
 }

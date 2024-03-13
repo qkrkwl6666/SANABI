@@ -6,6 +6,8 @@
 #include "TileMap.h"
 #include "SceneGame.h"
 #include "Crosshair.h"
+#include "Enemy.h"
+#include "Enemy_RifleMan.h"
 
 Player::Player(const std::string& name)
 	:SpriteGo(name)
@@ -31,6 +33,7 @@ Player::~Player()
 void Player::Init()
 {
 	// TODO : 플레이어 sortLayer 하면 팅기는 현상있음 
+	// 플레이어 스프라이트 적용후 오리진 잡기
 	SpriteGo::Init();
 	animator = new Animator();
 	animator->SetTarget(&sprite);
@@ -80,6 +83,7 @@ void Player::Reset()
 		"data/Animations/Player_Arm_Idle.csv");*/
 
 	tileMap = dynamic_cast<SceneGame*>(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetTileMap();
+	enemys = dynamic_cast<SceneGame*>(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetEnemys();
 
 	weaponAnimator = weapon->GetAnimator();
 
@@ -385,6 +389,11 @@ bool Player::PlayerTileCollisions(float dt)
 	}
 
 	return false;
+}
+
+void Player::PlayerEnemysCollisions(float dt)
+{
+
 }
 
 void Player::HandleRopeSwing(float dt)

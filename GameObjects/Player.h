@@ -5,6 +5,7 @@ class Animator;
 class Weapon;
 class TileMap;
 class Crosshair;
+class Enemy;
 
 class Player : public SpriteGo
 {
@@ -13,6 +14,7 @@ protected:
 	Animator* weaponAnimator = nullptr;
 	Weapon* weapon = nullptr;
 	TileMap* tileMap = nullptr;
+	std::list<Enemy*>* enemys;
 
 	Crosshair* mouse = FRAMEWORK.GetMouse();
 
@@ -83,6 +85,7 @@ public:
 	void Delete();
 
 	bool PlayerTileCollisions(float dt);
+	void PlayerEnemysCollisions(float dt);
 
 	void HandleRopeSwing(float dt);
 

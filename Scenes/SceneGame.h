@@ -4,13 +4,17 @@
 class Player;
 class TileMap;
 class Enemy_RifleMan;
+class Enemy;
 
 class SceneGame : public Scene
 {
 protected:
 	Player* player = nullptr;
 	TileMap* tileMap = nullptr;
-	Enemy_RifleMan* rifleman = nullptr;
+	//Enemy_RifleMan* rifleman = nullptr;
+
+	std::list<Enemy*> enemys;
+	float fff = 20.f;
 public:
 
 	SceneGame(SceneIds id);
@@ -36,6 +40,6 @@ public:
 
 	Player* GetPlayer();
 	TileMap* GetTileMap();
-
+	std::list<Enemy*>* GetEnemys();
 };
 

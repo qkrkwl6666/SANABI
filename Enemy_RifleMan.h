@@ -4,6 +4,7 @@
 class Animator;
 class SpriteGo;
 class Player;
+class Bullet;
 
 class Enemy_RifleMan : public Enemy
 {
@@ -22,21 +23,25 @@ protected:
 	SpriteGo* gun;
 	Player* player;
 
+	sf::Vector2f gunPoint;
 	sf::Vector2f playerPos;
+	sf::Vector2f playerBulletPos;
 
 	Status currentStatus;
 
-	bool isAiming = false;
+	std::vector<Bullet*> bullets;
 
+	
+
+	bool isAiming = false;
+	bool isShooting = false;
 	float aimingDt = 0.f;
 	float aimingDuration = 1.5f;
 
 	float shootingDt = 0.f;
-	float shootingDuration = 0.2f;
+	float shootingDuration = 0.01f;
 	int shootingMaxCount = 3; // ÃÑ¾Ë ¹ß»ç °¹¼ö
 	int shootingCurrentCount = 0;
-
-	sf::Vector2f gunPos;
 
 public:
 	Enemy_RifleMan(const std::string& name = "");

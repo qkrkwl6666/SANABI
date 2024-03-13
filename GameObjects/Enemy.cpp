@@ -25,6 +25,7 @@ void Enemy::Init()
 
 	animator = new Animator();
 	animator->SetTarget(&sprite);
+
 }
 
 void Enemy::Reset()
