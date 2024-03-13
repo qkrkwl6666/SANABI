@@ -38,13 +38,19 @@ void Player::Init()
 	animator = new Animator();
 	animator->SetTarget(&sprite);
 
+	SetTexture("graphics/player/Spr_SNB_IdleRand.png");
+	SetScale({ 3.f , 3.f });
+	SetOrigin(Origins::MC);
+
 	weapon = new Weapon("Weapon");
 	SCENE_MGR.GetScene(SceneIds::SceneTitle)->AddGo(weapon);
 
 	weapon->Init();
 	weapon->Reset();
 
-	SetScale({ 3.f , 3.f });
+	weapon->SetTexture("graphics/Spr_SNBArm.png");
+
+	weapon->SetOrigin(Origins::MC);
 
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Idle.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Running.csv"));
@@ -58,8 +64,14 @@ void Player::Init()
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Ceiling_Stick_Moving.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Shift_Rolling.csv"));
 
-	weapon->SetOrigin(Origins::MC);
-	SetOrigin(Origins::MC);
+	// Shift Skills
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Charge_Dash/Player_Charge_Attack.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Charge_Dash/Player_Charge_Dash.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Charge_Dash/Player_Charge_Dash_Charge_End.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Charge_Dash/Player_Charge_Dash_Charge_Loop.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Charge_Dash/Player_Charge_Dash_Charge_Start.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Charge_Dash/Player_Charge_Dash_End_Ground.csv"));
+
 	/*auto* clip = animator->GetClip("Player_Run_Landing");
 	clip->fps = 30;*/
 	
@@ -71,7 +83,30 @@ void Player::Reset()
 	animator->ClearEvent();
 
 	std::function<void()> funcInstanceShiftRolling = std::bind(&Player::PlayerShiftRolling, this);
-	animator->AddEvent("Player_Shift_Rolling", 10, funcInstanceShiftRolling);
+	animator->AddEvent("Player_Shift_Rolling", 5, funcInstanceShiftRolling);
+
+	animator->AddEvent("Player_Charge_Dash_Charge_Start", 21, [this]()
+		{
+			std::cout << "ChargeDash!!" << std::endl;
+
+			animator->Play("Player_Charge_Dash_Charge_Loop");
+			weaponAnimator->Play("Arm_Charge_Dash_Charge_Loop");
+		});
+
+	animator->AddEvent("Player_Charge_Dash", 9, [this]()
+		{
+			std::cout << "ChargeDash Attack!!" << std::endl;
+
+			animator->Play("Player_Charge_Attack");
+			weaponAnimator->Play("Arm_Charge_Attack");
+		});
+
+	animator->AddEvent("Player_Charge_Attack", 8, [this]()
+		{
+			std::cout << "Player_Charge_Attack Finish!!" << std::endl;
+			this->SetChargeDash(false);
+			this->SetStatus(Status::IDLE);
+		});
 
 	//std::function<void()> funcInstance2 = std::bind(&Player::PlayerJumping, this);
 	//animator->AddEvent("Player_Falling", 2, funcInstance2);
@@ -94,7 +129,6 @@ void Player::Reset()
 
 	weapon->SetPosition(WeaponPoint);
 
-	SetOrigin(Origins::MC);
 	SetPosition({ FRAMEWORK.GetWindowSize().x * 0.5f ,
 		FRAMEWORK.GetWindowSize().y * 0.6f });
 }
@@ -103,10 +137,12 @@ void Player::Update(float dt)
 {
 	SpriteGo::Update(dt);
 	animator->Update(dt);
-	weapon->Update(dt);
-
-	// TODO : 무기 UPDATE 안되는 에러있음 강제 호출중
-
+	weaponAnimator->Update(dt);
+	//std::cout << Falling << std::endl;
+	
+	// TODO : 
+	// Status 만들고 상태에 따른 Update 해야하지만 보스 먼저 하고 나중에?
+	
 	ScreenPos = SCENE_MGR.GetCurrentScene()->UiToScreen((sf::Vector2f)mouse->GetPosition());
 	worldPos = SCENE_MGR.GetCurrentScene()->ScreenToWorld((sf::Vector2i)ScreenPos);
 	HandleRopeSwing(dt);
@@ -114,7 +150,8 @@ void Player::Update(float dt)
 	//std::cout << GetPosition().x << " " << GetPosition().y << std::endl;
 
 	//std::cout << velocity.y << std::endl;
-	//std::cout << isGround << std::endl;
+	std::cout << animator->IsPlaying() << std::endl;
+	//std::cout << animator->GetCurrentClipId() << std::endl;
 
 	float h = InputMgr::GetAxisRaw(Axis::Horizontal); // - 1 0 1
 
@@ -127,12 +164,63 @@ void Player::Update(float dt)
 		velocity.y = -500.f;
 	}
 
+	if (InputMgr::GetKeyDown(sf::Keyboard::LShift))
+	{
+		isChargeDash = true;
+		currentStatus = Status::CHARGE_DESH;
+		animator->Play("Player_Charge_Dash_Charge_Start");
+		weaponAnimator->Play("Arm_ChargeDashChargeStart");
+	}
+
+	switch (currentStatus)
+	{
+	case Player::Status::IDLE:
+
+		break;
+	case Player::Status::CHARGE_DESH:
+		// 중력 작용 안받음
+		velocity = { 0 , 0 };
+		if (InputMgr::GetKeyUp(sf::Keyboard::LShift))
+		{
+			auto CloseEnemy = std::min_element(enemys->begin(), enemys->end(), [this]
+			(const Enemy* lhs , const Enemy* rhs)
+				{
+					float lhsLeng = Utils::Distance(GetPosition(), lhs->GetPosition());
+					float rhsLeng = Utils::Distance(GetPosition(), rhs->GetPosition());
+
+					return lhsLeng < rhsLeng;
+				});
+
+			if (CloseEnemy != enemys->end() && Utils::Distance(GetPosition(), 
+				(*CloseEnemy)->GetPosition()) < 500)
+			{
+				// 가까운 적 찾음 공격 시작
+				SetPosition((*CloseEnemy)->GetPosition());
+				animator->Play("Player_Charge_Dash");
+				weaponAnimator->Play("Arm_Charge_Desh");
+			}
+			else
+			{
+				// 공격 캔슬
+				animator->Play("Player_Charge_Dash_Charge_End");
+				weaponAnimator->Play("Arm_ChargeDashChargeEnd.png");
+				isChargeDash = false;
+				currentStatus = Status::IDLE;
+			}
+			
+		}
+		return;
+		break;
+	default:
+		break;
+	}
+
 	//std::cout << swingAcceleration << std::endl;
 
 	// 속도에 따른 스윙 가속도 증가 로직
 	speedFactor = std::abs(velocity.x) / speed; // 현재 속도를 최대 속도로 나눈 비율
 
-	if (!isSwinging)
+	if (!isSwinging && !isChargeDash)
 	{
 		velocity.x = h * speed;
 		if (!isGround)
@@ -160,12 +248,13 @@ void Player::Update(float dt)
 	}
 	else
 	{
-		if(!isCollisions)
+		if(!isCollisions && !isChargeDash)
 			Translate(velocity * dt);
 	}
+
 	PlayerTileCollisions(dt);
 
-	if (velocity.y > 100.f && !isGround && !Falling && !isSwinging && !isShiftRolling)
+	if (velocity.y > 100.f && !isGround && !Falling && !isSwinging && !isShiftRolling && !isChargeDash)
 	{
 		animator->Play("Player_Falling");
 		weaponAnimator->Play("Player_Arm_Falling");
@@ -173,7 +262,7 @@ void Player::Update(float dt)
 		isSwingingAnimation = false;
 	}
 
-	if (!animator->IsPlaying())
+	if (!animator->IsPlaying() && isGround)
 	{
 		animator->Play("Player_Idle");
 		weaponAnimator->Play("Player_Arm_Idle");
@@ -330,7 +419,7 @@ bool Player::PlayerTileCollisions(float dt)
 				SetPosition({ GetPosition().x ,tileMap->GetTiles()
 					[bottomIndex.y][bottomIndex.x].shape.getGlobalBounds().top -
 					(GetGlobalBounds().height / 2) });
-				std::cout << GetPosition().y << std::endl;
+				//std::cout << GetPosition().y << std::endl;
 				isGround = true;
 				velocity.y = 0.f;
 				isCollisions = true;
@@ -498,11 +587,11 @@ void Player::HandleRopeSwing(float dt)
 				animator->Play("Player_Shift_Rolling");
 				weaponAnimator->Play("Player_Arm_Shift_Rolling");
 			}
-			else
-			{
-				animator->Play("Player_Falling");
-				weaponAnimator->Play("Player_Arm_Falling");
-			}
+			//else
+			//{
+			//	animator->Play("Player_Falling");
+			//	weaponAnimator->Play("Player_Arm_Falling");
+			//}
 
 		}
 

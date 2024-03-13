@@ -116,7 +116,6 @@ void Animator::Play(const std::string& clipId, bool clearQueue)
 	}
 
 	// clipId가 find할때만 작동
-	
 	isPlaying = true;
 	accumTime = 0.f;
 	currentClip = &clips[clipId];

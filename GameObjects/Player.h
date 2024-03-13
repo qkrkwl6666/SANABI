@@ -9,12 +9,22 @@ class Enemy;
 
 class Player : public SpriteGo
 {
+	enum class Status
+	{
+		IDLE,
+		CHARGE_DESH,
+
+	};
+
+
 protected:
 	Animator* animator = nullptr;
 	Animator* weaponAnimator = nullptr;
 	Weapon* weapon = nullptr;
 	TileMap* tileMap = nullptr;
 	std::list<Enemy*>* enemys;
+
+	Status currentStatus = Status::IDLE;
 
 	Crosshair* mouse = FRAMEWORK.GetMouse();
 
@@ -30,6 +40,7 @@ protected:
 	bool isSwinging = false;
 	bool isSwingingAnimation = false;
 	bool isShiftRolling = false;
+	bool isChargeDash = false;
 
 	bool isCollisions = false;
 
@@ -81,6 +92,7 @@ public:
 		const std::string& weapon, bool clearQueue = true);
 
 	void PlayerShiftRolling();
+
 	void PlayerJumping();
 	void Delete();
 
@@ -99,6 +111,8 @@ public:
 	void HandleSwingMotion(float dt, float speedFactor);
 
 	void UpdateSwing(float dt);
+	void SetStatus(Status status) { currentStatus = status;}
+	void SetChargeDash(bool value = false) {isChargeDash = value;}
 
 	void ClampVelocity(sf::Vector2f& velocity, float minY, float maxY)
 	{

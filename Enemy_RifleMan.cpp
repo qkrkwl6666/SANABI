@@ -76,8 +76,9 @@ void Enemy_RifleMan::Update(float dt)
 	gunAnimator->Update(dt);
 	
 	//std::cout << isShooting << std::endl;
-	std::cout << shootingCurrentCount << std::endl;
+	//std::cout << shootingCurrentCount << std::endl;
 	//std::cout << shootingDt << std::endl;
+
 	for (auto& data : bullets)
 	{
 		if (data->GetActive())

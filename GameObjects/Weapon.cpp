@@ -40,6 +40,14 @@ void Weapon::Init()
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Arm_Ceiling_Stick_Moving.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Arm_Shift_Rolling.csv"));
 
+	// Shift ChargeDesh
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Charge_Dash/Arm_Charge_Dash_Charge_Start.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Charge_Dash/Arm_Charge_Dash_Charge_Loop.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Charge_Dash/Arm_Charge_Attack.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Charge_Dash/Arm_Charge_Dash_Charge_End.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Charge_Dash/Arm_Charge_Dash_End_Ground.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Charge_Dash/Arm_Charge_Dash.csv"));
+
 }
 
 void Weapon::Reset()
