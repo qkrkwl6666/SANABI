@@ -31,6 +31,8 @@ public:
 	void Draw(sf::RenderWindow& window) override;
 	void Reset() override;
 
+	sf::Sprite* GetSprite() { return &sprite; }
+
 	inline const sf::FloatRect GetLocalBounds() const { return sprite.getLocalBounds(); }
 	inline const sf::FloatRect GetGlobalBounds() const { return sprite.getGlobalBounds(); }
 };

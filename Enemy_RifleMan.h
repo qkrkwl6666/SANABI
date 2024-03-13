@@ -22,7 +22,21 @@ protected:
 	SpriteGo* gun;
 	Player* player;
 
+	sf::Vector2f playerPos;
+
 	Status currentStatus;
+
+	bool isAiming = false;
+
+	float aimingDt = 0.f;
+	float aimingDuration = 1.5f;
+
+	float shootingDt = 0.f;
+	float shootingDuration = 0.2f;
+	int shootingMaxCount = 3; // ÃÑ¾Ë ¹ß»ç °¹¼ö
+	int shootingCurrentCount = 0;
+
+	sf::Vector2f gunPos;
 
 public:
 	Enemy_RifleMan(const std::string& name = "");
@@ -33,5 +47,7 @@ public:
 	void Update(float dt) override;
 	void LateUpdate(float dt) override;
 	void Draw(sf::RenderWindow& window) override;
+
+	void AnimationIdle();
 };
 
