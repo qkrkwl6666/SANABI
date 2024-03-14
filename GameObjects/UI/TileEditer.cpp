@@ -280,7 +280,8 @@ void TileEditer::Update(float dt)
 	}
 
 	// 마우스 좌클릭 할때만 Update
-	if (InputMgr::GetMouseButton(sf::Mouse::Left) && !GetActiveTypeUI())
+	if (InputMgr::GetMouseButton(sf::Mouse::Left) && !GetActiveTypeUI() && 
+		!sprites["SelectBackground"]->GetGlobalBounds().contains(mouse->GetPosition()))
 	{
 		TileMouseSelection(false);
 	}
@@ -489,18 +490,4 @@ std::string TileEditer::convertToRelativePath(const std::wstring& absolutePathW)
 	std::string absolutePath = Utils::WSTRINGToString(absolutePathW);
 
 	return absolutePath;
-
-	// TODO : 상대경로 에러 고쳐야함 
-	
-	// 백슬래시를 슬래시로 변환
-	//std::replace(absolutePath.begin(), absolutePath.end(), '\\', '/');
-
-	//auto pos = absolutePath.find("/tileset/");
-
-	//if (pos != std::string::npos)
-	//{
-	//	// 'tileset'을 포함한 경로의 나머지 부분을 반환
-	//	return absolutePath.substr(pos);
-	//}
-	//return absolutePath; // 'tileset'이 없는 경우 원본 경로 반환
 }

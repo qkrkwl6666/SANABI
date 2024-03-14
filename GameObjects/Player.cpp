@@ -39,7 +39,7 @@ void Player::Init()
 	animator->SetTarget(&sprite);
 
 	SetTexture("graphics/player/Spr_SNB_IdleRand.png");
-	SetScale({ 3.f , 3.f });
+	SetScale({ 2.f , 2.f });
 	SetOrigin(Origins::MC);
 
 	weapon = new Weapon("Weapon");
@@ -130,8 +130,7 @@ void Player::Reset()
 
 	weapon->SetPosition(WeaponPoint);
 
-	SetPosition({ FRAMEWORK.GetWindowSize().x * 0.5f ,
-		FRAMEWORK.GetWindowSize().y * 0.6f });
+	SetPosition({ 8200.f , 1550.f });
 }
 
 void Player::Update(float dt)
@@ -147,6 +146,9 @@ void Player::Update(float dt)
 	ScreenPos = SCENE_MGR.GetCurrentScene()->UiToScreen((sf::Vector2f)mouse->GetPosition());
 	worldPos = SCENE_MGR.GetCurrentScene()->ScreenToWorld((sf::Vector2i)ScreenPos);
 	HandleRopeSwing(dt);
+
+	std::cout << worldPos.x << std::endl;
+	std::cout << worldPos.y << std::endl;
 
 	//std::cout << GetPosition().x << " " << GetPosition().y << std::endl;
 
@@ -427,7 +429,7 @@ bool Player::PlayerTileCollisions(float dt)
 	sf::Vector2i tileIndex = { (int)GetPosition().x / (int)tileMap->GetTileSize().x ,
 		(int)GetPosition().y / (int)tileMap->GetTileSize().y };
 
-	if (tileIndex.x >= 2 && tileIndex.x < tileMap->GetMapSize().x - 2 &&
+	if (tileIndex.x >= 1 && tileIndex.x < tileMap->GetMapSize().x - 1 &&
 		tileIndex.y >= 2 && tileIndex.y < tileMap->GetMapSize().y - 2)
 	{
 		// 하단 타일
@@ -446,7 +448,7 @@ bool Player::PlayerTileCollisions(float dt)
 				isGround = true;
 				velocity.y = 0.f;
 				isCollisions = true;
-				return true;
+				//return true;
 			}
 		}
 		else if (tileMap->GetTiles()[bottomIndex.y + 1][bottomIndex.x].type != TileMap::TileType::WALL)
@@ -459,15 +461,14 @@ bool Player::PlayerTileCollisions(float dt)
 
 		if (tileMap->GetTiles()[TopIndex.y][TopIndex.x].type == TileMap::TileType::WALL)
 		{
-			if (GetPosition().y + (GetGlobalBounds().height / 2) <
-				tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].shape.getGlobalBounds().top
-				+ tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].shape.getGlobalBounds().height)
+			if (GetGlobalBounds().top <
+				tileMap->GetTiles()[TopIndex.y][TopIndex.x].shape.getGlobalBounds().top
+				+ tileMap->GetTiles()[TopIndex.y][TopIndex.x].shape.getGlobalBounds().height)
 			{
-				SetPosition({ GetPosition().x ,tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].shape.getGlobalBounds().top
-				+ tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].shape.getGlobalBounds().height -
-					(GetGlobalBounds().height / 2) });;
+				SetPosition({ GetPosition().x ,tileMap->GetTiles()[TopIndex.y][TopIndex.x].shape.getGlobalBounds().top
+				+ tileMap->GetTiles()[TopIndex.y][TopIndex.x].shape.getGlobalBounds().height + 30 });;
 				isCollisions = true;
-				return true;
+				//return true;
 			}
 		}
 
@@ -483,7 +484,7 @@ bool Player::PlayerTileCollisions(float dt)
 					shape.getGlobalBounds().left - (GetGlobalBounds().width / 2) ,
 					GetPosition().y });
 				isCollisions = true;
-				return true;
+				//return true;
 			}
 		}
 
@@ -500,7 +501,7 @@ bool Player::PlayerTileCollisions(float dt)
 					shape.getGlobalBounds().width + (GetGlobalBounds().width / 2) ,
 					GetPosition().y });
 				isCollisions = true;
-				return true;
+				//return true;
 			}
 		}
 	}

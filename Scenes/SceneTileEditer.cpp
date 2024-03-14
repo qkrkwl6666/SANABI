@@ -13,7 +13,7 @@ SceneTileEditer::SceneTileEditer(SceneIds id)
 void SceneTileEditer::Init()
 {
 	
-	tileMap = new TileMap("TileMap" , {50.f , 50.f } , {100, 100});
+	tileMap = new TileMap("TileMap" , {50.f , 50.f } , {200, 60});
 	tileEditer = new TileEditer();
 
 	AddGo(tileMap , Scene::World);

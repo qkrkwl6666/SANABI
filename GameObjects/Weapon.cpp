@@ -28,7 +28,7 @@ void Weapon::Init()
 	player = dynamic_cast<SceneGame*>
 		(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetPlayer();
 	
-	SetScale({ 2.5f , 2.5f });
+	SetScale({ 1.5f , 1.5f });
 	SetOrigin(Origins::MC);;
 
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Arm_Idle.csv"));

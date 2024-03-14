@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "TextGo.h"
 
+class SpriteGo;
 
 class TileMap : public GameObject
 {
@@ -43,7 +44,9 @@ public:
 
 protected:
 	std::vector<std::vector<Tile>> tiles;
+	std::unordered_map<std::string, SpriteGo*> backgrounds;
 
+	Animator animator;
 	sf::Vector2f tileSize; // 타일의 크기
 	sf::Vector2i tileMap; // 타일맵 전체 크기
 	wchar_t currentDirectory[256];

@@ -7,6 +7,7 @@
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h" // JSON 문자열화를 위함
 #include "rapidjson/filewritestream.h" // 파일 스트림
+#include "SpriteGo.h"
 #include <cstdio> // C 표준 입출력 관련 함수
 #include <fstream>
 #include <sstream>
@@ -18,6 +19,30 @@
 TileMap::TileMap(const std::string& name) : GameObject(name)
 {
 
+	backgrounds.insert({ "BossRoomBackBG" , new SpriteGo("BossRoomBackBG") });
+	backgrounds["BossRoomBackBG"]->SetScale({ 0.73f , 1.1f });
+	backgrounds["BossRoomBackBG"]->SetTexture("graphics/Background/BossRoom/Spr_Chap4_BossRoom_BG.png");
+	backgrounds["BossRoomBackBG"]->SetOrigin(Origins::TR);
+	backgrounds["BossRoomBackBG"]->SetPosition({ 9000, 1000 });
+
+	backgrounds.insert({ "BossRoomBG" , new SpriteGo("BossRoomBG") });
+
+	backgrounds["BossRoomBG"]->SetTexture("graphics/Background/BossRoom/Spr_Chap4_BossRoom_Front.png");
+	backgrounds["BossRoomBG"]->SetOrigin(Origins::TR);
+	backgrounds["BossRoomBG"]->SetPosition({ 9000, 1000 });
+
+	backgrounds.insert({ "Clockwork" , new SpriteGo("Clockwork") });
+	backgrounds["Clockwork"]->SetTexture("graphics/Background/BossRoom/Spr_Chap4_BossRoom_ClockworkIdle (lp) (1).png");
+	backgrounds["Clockwork"]->SetOrigin(Origins::MC);
+	backgrounds["Clockwork"]->SetPosition({ 8000 , 1550 });
+
+	animator.SetTarget(backgrounds["Clockwork"]->GetSprite());
+
+	animator.AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Background/BossRoom_ClockworkIdle.csv"));
+	animator.Play("BossRoom_ClockworkIdle");
+
+
+	//backgrounds["BossRoomBG"]->GetSprite()->setColor(sf::Color::Color(255, 255, 255, 50));
 }
 
 TileMap::TileMap(const std::string& name, sf::Vector2f tileSize, sf::Vector2i tileMap)
@@ -37,6 +62,25 @@ TileMap::TileMap(const std::string& name, sf::Vector2f tileSize, sf::Vector2i ti
 	}
 
 	GetCurrentDirectory(MAX_PATH, currentDirectory);
+
+	backgrounds.insert({ "BossRoomBG" , new SpriteGo("BossRoomBG") });
+
+	backgrounds["BossRoomBG"]->SetTexture("graphics/Background/BossRoom/Spr_Chap4_BossRoom_Front.png");
+	backgrounds["BossRoomBG"]->SetOrigin(Origins::TR);
+	backgrounds["BossRoomBG"]->SetPosition({ 9000, 1000 });
+	backgrounds["BossRoomBG"]->GetSprite()->setColor(sf::Color::Color(255, 255, 255,120));
+
+	//backgrounds.insert({ "BossRoomBackBG" , new SpriteGo("BossRoomBackBG") });
+	//backgrounds["BossRoomBackBG"]->SetTexture("graphics/Background/BossRoom/Spr_Chap4_BossRoom_BG.png");
+	//backgrounds["BossRoomBackBG"]->SetOrigin(Origins::TR);
+	//backgrounds["BossRoomBackBG"]->SetPosition({ 9000, 1000 });
+
+	animator.AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Background/BossRoom_ClockworkIdle.csv"));
+
+	//backgrounds.insert({ "BossRoomClockworkIdle" , new SpriteGo("BossRoomClockworkIdle") });
+
+	
+
 }
 
 void TileMap::Init()
@@ -60,11 +104,13 @@ void TileMap::Update(float dt)
 {
 	GameObject::Update(dt);
 
+	animator.Update(dt);
 }
 
 void TileMap::Draw(sf::RenderWindow& window)
 {
 	GameObject::Draw(window);
+
 	// 모든 타일에 대해 반복
 	for (const auto& row : tiles)
 	{
@@ -73,6 +119,12 @@ void TileMap::Draw(sf::RenderWindow& window)
 			window.draw(tile.shape); // 각 타일의 shape를 그린다.
 		}
 	}
+
+	for (auto& data : backgrounds)
+	{
+		data.second->Draw(window);
+	}
+
 }
 
 void TileMap::SetOrigin(Origins preset)

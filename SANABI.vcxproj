@@ -137,9 +137,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="GameObjects\BossMajor.cpp" />
+    <ClCompile Include="GameObjects\Bullet.cpp" />
     <ClCompile Include="Crosshair.cpp" />
-    <ClCompile Include="Enemy_RifleMan.cpp" />
+    <ClCompile Include="GameObjects\Enemy_RifleMan.cpp" />
     <ClCompile Include="GameObjects\Enemy_Defender.cpp" />
     <ClCompile Include="GameObjects\Enemy.cpp" />
     <ClCompile Include="GameObjects\Player.cpp" />
@@ -173,9 +174,10 @@
     <ClCompile Include="GameObjects\UI\TileEditer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Bullet.h" />
+    <ClInclude Include="GameObjects\BossMajor.h" />
+    <ClInclude Include="GameObjects\Bullet.h" />
     <ClInclude Include="Crosshair.h" />
-    <ClInclude Include="Enemy_RifleMan.h" />
+    <ClInclude Include="GameObjects\Enemy_RifleMan.h" />
     <ClInclude Include="GameObjects\Enemy_Defender.h" />
     <ClInclude Include="GameObjects\Enemy.h" />
     <ClInclude Include="Framework\rapidjson.h" />

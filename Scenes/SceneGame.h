@@ -5,12 +5,15 @@ class Player;
 class TileMap;
 class Enemy_RifleMan;
 class Enemy;
+class BossMajor;
 
 class SceneGame : public Scene
 {
 protected:
 	Player* player = nullptr;
 	TileMap* tileMap = nullptr;
+	BossMajor* bossMajor = nullptr;
+
 	//Enemy_RifleMan* rifleman = nullptr;
 
 	std::list<Enemy*> enemys;

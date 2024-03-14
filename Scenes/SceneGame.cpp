@@ -5,9 +5,9 @@
 #include "Player.h"
 #include "TileMap.h"
 #include "Enemy_RifleMan.h"
+#include "BossMajor.h"
 
 SceneGame::SceneGame(SceneIds id) : Scene(id)
-	
 {
 
 }
@@ -16,15 +16,19 @@ void SceneGame::Init()
 {
 	player = new Player("Player");
 	tileMap = new TileMap("TileMap");
+	bossMajor = new BossMajor("BossMajor");
+
 	// rifleman = new Enemy_RifleMan("rifleman");
 	// rifleman->SetPosition(player->GetPosition());
 
-	tileMap->LoadTileMap("tilejson/33.json" , 0.f);
+	tileMap->LoadTileMap("tilejson/BossStage.json" , 0.f);
 
 	tileMap->sortLayer = -1;
 
 	AddGo(tileMap, Scene::World);
+	AddGo(bossMajor, Scene::World);
 	AddGo(player, Scene::World);
+
 	//AddGo(rifleman, Scene::World);
 
 	enemys.push_back(new Enemy_RifleMan());
