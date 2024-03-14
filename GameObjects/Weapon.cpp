@@ -55,8 +55,6 @@ void Weapon::Reset()
 	SpriteGo::Reset();
 
 	animator->ClearEvent();
-                                 
-	//animator->Play("data/Animations/Player_Arm_Idle.csv");
 	 
 	animator->Play("Player_Arm_Idle");
 }

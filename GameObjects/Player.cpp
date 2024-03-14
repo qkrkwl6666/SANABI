@@ -127,7 +127,7 @@ void Player::Reset()
 	weaponAnimator->Play("Player_Arm_Idle");
 
 	WeaponPoint = { GetPosition().x - 30, GetPosition().y + 30 };
-
+	
 	weapon->SetPosition(WeaponPoint);
 
 	SetPosition({ 8200.f , 1550.f });
@@ -147,9 +147,6 @@ void Player::Update(float dt)
 	worldPos = SCENE_MGR.GetCurrentScene()->ScreenToWorld((sf::Vector2i)ScreenPos);
 	HandleRopeSwing(dt);
 
-	std::cout << worldPos.x << std::endl;
-	std::cout << worldPos.y << std::endl;
-
 	//std::cout << GetPosition().x << " " << GetPosition().y << std::endl;
 
 	//std::cout << velocity.y << std::endl;
@@ -164,9 +161,6 @@ void Player::Update(float dt)
 		animator->Play("Player_Charge_Dash_Charge_Start");
 		weaponAnimator->Play("Arm_ChargeDashChargeStart");
 	}
-
-	std::cout << velocity.y << std::endl;
-
 	// Shift ±¸Çö
 
 	if (isSwinging)

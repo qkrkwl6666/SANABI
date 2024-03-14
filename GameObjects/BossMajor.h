@@ -1,6 +1,8 @@
 #pragma once
 #include "Enemy.h"
 
+class Frail;
+class Player;
 
 class BossMajor : public Enemy
 {
@@ -10,6 +12,10 @@ protected:
 		NONE,
 		IDLE,
 		SPHERE_ATTACK,
+		MOVE,
+		RUSH_ATTACK,
+		NORMAL1_ATTACK,
+
 
 	};
 
@@ -25,9 +31,18 @@ protected:
 
 	std::vector<sf::Vector2f> MajorPos;
 
+	Player* player = nullptr;
+	Frail* frail = nullptr;
+	Animator* frialAnimator = nullptr;
+
 	Status currentStauts = Status::NONE;
+	
+	MajorPosition currentPosition;
 
 	bool isSphere_Attack = false;
+	bool isMove = false;
+	bool isRush_Attack = false;
+	bool isNormal1_Attack = false;
 
 public:
 	BossMajor(const std::string& name = "");
@@ -41,5 +56,6 @@ public:
 	void Draw(sf::RenderWindow& window) override;
 
 	void SetAnimationEvent();
+	void RandomMove();
 };
 

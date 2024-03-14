@@ -137,6 +137,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameObjects\Frail.cpp" />
     <ClCompile Include="GameObjects\BossMajor.cpp" />
     <ClCompile Include="GameObjects\Bullet.cpp" />
     <ClCompile Include="Crosshair.cpp" />
@@ -174,6 +175,7 @@
     <ClCompile Include="GameObjects\UI\TileEditer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameObjects\Frail.h" />
     <ClInclude Include="GameObjects\BossMajor.h" />
     <ClInclude Include="GameObjects\Bullet.h" />
     <ClInclude Include="Crosshair.h" />
