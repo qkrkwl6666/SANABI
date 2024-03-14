@@ -27,7 +27,6 @@ void SceneGame::Init()
 	AddGo(player, Scene::World);
 	//AddGo(rifleman, Scene::World);
 
-
 	enemys.push_back(new Enemy_RifleMan());
 	enemys.push_back(new Enemy_RifleMan());
 	enemys.push_back(new Enemy_RifleMan());

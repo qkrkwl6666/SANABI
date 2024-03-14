@@ -45,6 +45,10 @@ void Enemy::LateUpdate(float dt)
 	SpriteGo::LateUpdate(dt);
 }
 
+void Enemy::Dead()
+{
+}
+
 void Enemy::Draw(sf::RenderWindow& window)
 {
 	SpriteGo::Draw(window);

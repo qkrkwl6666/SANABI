@@ -31,8 +31,6 @@ protected:
 
 	std::vector<Bullet*> bullets;
 
-	
-
 	bool isAiming = false;
 	bool isShooting = false;
 	float aimingDt = 0.f;
@@ -52,6 +50,8 @@ public:
 	void Update(float dt) override;
 	void LateUpdate(float dt) override;
 	void Draw(sf::RenderWindow& window) override;
+
+	void Dead();
 
 	void AnimationIdle();
 };

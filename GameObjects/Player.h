@@ -24,6 +24,8 @@ protected:
 	TileMap* tileMap = nullptr;
 	std::list<Enemy*>* enemys;
 
+	float chargeDashSpeed = 1000.f;
+
 	Status currentStatus = Status::IDLE;
 
 	Crosshair* mouse = FRAMEWORK.GetMouse();

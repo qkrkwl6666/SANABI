@@ -18,6 +18,7 @@ public:
 	void Reset() override;
 	void Update(float dt) override;
 	void LateUpdate(float dt) override;
+	virtual void Dead();
 	void Draw(sf::RenderWindow& window) override;
 };
 

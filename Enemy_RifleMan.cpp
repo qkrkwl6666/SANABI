@@ -34,7 +34,7 @@ void Enemy_RifleMan::Init()
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Enemy_RifleMan_Aiming.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Enemy_RifleMan_Shooting.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Enemy_RifleMan_Ready_Shot.csv"));
-
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Enemy_RifleMan_Dead.csv"));
 
 	SetTexture("graphics/Enemy/RifleMan/Spr_ENE_Rifleman_Ready2Shot.png");
 
@@ -60,9 +60,7 @@ void Enemy_RifleMan::Init()
 	gunAnimator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Enemy_RifleMan_Arm_Shooting.csv"));
 	gunAnimator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Enemy_RifleMan_Arm_Ready_Shot.csv"));
 
-
 	bullets.resize(12, new Bullet());
-
 }
 
 void Enemy_RifleMan::Reset()
@@ -212,8 +210,12 @@ void Enemy_RifleMan::Draw(sf::RenderWindow& window)
 		{
 			data->Draw(window);
 		}
-
 	}
+}
+
+void Enemy_RifleMan::Dead()
+{
+	animator->Play("Enemy_RifleMan_Dead");
 }
 
 void Enemy_RifleMan::AnimationIdle()

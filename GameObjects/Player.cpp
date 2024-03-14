@@ -104,6 +104,7 @@ void Player::Reset()
 	animator->AddEvent("Player_Charge_Attack", 8, [this]()
 		{
 			std::cout << "Player_Charge_Attack Finish!!" << std::endl;
+
 			this->SetChargeDash(false);
 			this->SetStatus(Status::IDLE);
 		});
@@ -150,21 +151,11 @@ void Player::Update(float dt)
 	//std::cout << GetPosition().x << " " << GetPosition().y << std::endl;
 
 	//std::cout << velocity.y << std::endl;
-	std::cout << animator->IsPlaying() << std::endl;
 	//std::cout << animator->GetCurrentClipId() << std::endl;
 
 	float h = InputMgr::GetAxisRaw(Axis::Horizontal); // - 1 0 1
 
-	// 점프 시작
-	if (InputMgr::GetKeyDown(sf::Keyboard::Space))
-	{
-		isGround = false;
-		animator->Play("Player_Jumping");
-		weaponAnimator->Play("Player_Arm_Jumping");
-		velocity.y = -500.f;
-	}
-
-	if (InputMgr::GetKeyDown(sf::Keyboard::LShift))
+	if (InputMgr::GetKeyDown(sf::Keyboard::LShift) && !isSwinging)
 	{
 		isChargeDash = true;
 		currentStatus = Status::CHARGE_DESH;
@@ -172,14 +163,44 @@ void Player::Update(float dt)
 		weaponAnimator->Play("Arm_ChargeDashChargeStart");
 	}
 
+	std::cout << velocity.y << std::endl;
+
+	// Shift 구현
+
+	if (isSwinging)
+	{
+		if (InputMgr::GetKey(sf::Keyboard::A) && InputMgr::GetKey(sf::Keyboard::LShift))
+		{
+			velocity.y = -500;
+			velocity.x = -1500;
+		}
+		else if (InputMgr::GetKey(sf::Keyboard::D) && InputMgr::GetKey(sf::Keyboard::LShift))
+		{
+			velocity.y = -500;
+			velocity.x = +1500;
+		}
+		//if (InputMgr::GetKeyDown(sf::Keyboard::Space))
+		//{
+		//	SetPosition(ropeAnchorPoint);
+		//}
+	}
+
 	switch (currentStatus)
 	{
 	case Player::Status::IDLE:
-
+		// 점프 시작
+		if (InputMgr::GetKeyDown(sf::Keyboard::Space) && !isSwinging && !isChargeDash && !isShiftRolling)
+		{
+			isGround = false;
+			animator->Play("Player_Jumping");
+			weaponAnimator->Play("Player_Arm_Jumping");
+			velocity.y = -500.f;
+		}
 		break;
 	case Player::Status::CHARGE_DESH:
 		// 중력 작용 안받음
 		velocity = { 0 , 0 };
+		weapon->SetPosition(GetPosition() + WeaponPoint);
 		if (InputMgr::GetKeyUp(sf::Keyboard::LShift))
 		{
 			auto CloseEnemy = std::min_element(enemys->begin(), enemys->end(), [this]
@@ -196,8 +217,11 @@ void Player::Update(float dt)
 			{
 				// 가까운 적 찾음 공격 시작
 				SetPosition((*CloseEnemy)->GetPosition());
+				SetRotation(Utils::Angle((*CloseEnemy)->GetPosition() - GetPosition()));
 				animator->Play("Player_Charge_Dash");
 				weaponAnimator->Play("Arm_Charge_Desh");
+				(*CloseEnemy)->Dead();
+				
 			}
 			else
 			{
@@ -207,7 +231,6 @@ void Player::Update(float dt)
 				isChargeDash = false;
 				currentStatus = Status::IDLE;
 			}
-			
 		}
 		return;
 		break;
@@ -404,8 +427,8 @@ bool Player::PlayerTileCollisions(float dt)
 	sf::Vector2i tileIndex = { (int)GetPosition().x / (int)tileMap->GetTileSize().x ,
 		(int)GetPosition().y / (int)tileMap->GetTileSize().y };
 
-	if (tileIndex.x >= 1 && tileIndex.x < tileMap->GetMapSize().x - 1 &&
-		tileIndex.y >= 1 && tileIndex.y < tileMap->GetMapSize().y - 1)
+	if (tileIndex.x >= 2 && tileIndex.x < tileMap->GetMapSize().x - 2 &&
+		tileIndex.y >= 2 && tileIndex.y < tileMap->GetMapSize().y - 2)
 	{
 		// 하단 타일
 	// 플레이어의 하단 타일
@@ -644,6 +667,7 @@ sf::Vector2i Player::FindClosestTile()
 						contains(enemy->GetPosition()))
 					{
 						SetPosition(enemy->GetPosition());
+						enemy->Dead();
 						return closestTileIndex;
 					}
 					else
@@ -697,16 +721,16 @@ void Player::UpdateSwing(float dt)
 	float angle = atan2(anchorToPoint.y, anchorToPoint.x);
 
 	// 플레이어 입력에 따른 스윙 가속도 조절
-	if (InputMgr::GetKeyDown(sf::Keyboard::A))
-	{
-		swingAcceleration -= swingForce * dt; // 왼쪽으로 스윙 가속
-		swingDirection = -1;
-	}
-	else if (InputMgr::GetKeyDown(sf::Keyboard::D))
-	{
-		swingAcceleration += swingForce * dt; // 오른쪽으로 스윙 가속
-		swingDirection = 1;
-	}
+	//if (InputMgr::GetKeyDown(sf::Keyboard::A))
+	//{
+	//	swingAcceleration -= swingForce * dt; // 왼쪽으로 스윙 가속
+	//	swingDirection = -1;
+	//}
+	//else if (InputMgr::GetKeyDown(sf::Keyboard::D))
+	//{
+	//	swingAcceleration += swingForce * dt; // 오른쪽으로 스윙 가속
+	//	swingDirection = 1;
+	//}
 
 	// 스윙 방향에 따라 위치 업데이트
 	float swingSpeed = swingAcceleration * swingDirection;
