@@ -121,15 +121,25 @@ void TileMap::SetFlipY(bool flip)
 	
 }
 
-void TileMap::SetTileTexture(int y, int x, const std::string& filePath ,const TileType& type)
+void TileMap::SetTileTexture(int y, int x, const std::string& filePath ,const TileType& type
+	, bool isRemove)
 {
 	// TODO : texture 타일 구조체에 있는게 아니라 멤버변수로 빼기
-	tiles[y][x].texture.loadFromFile(filePath);
-	tiles[y][x].textureFilePath = filePath;
-	tiles[y][x].shape.setTexture(&tiles[y][x].texture);
-	tiles[y][x].shape.setFillColor(sf::Color::White);
-	tiles[y][x].shape.setOutlineThickness(1.f);
-	tiles[y][x].type = type;
+	if (!isRemove)
+	{
+		tiles[y][x].texture.loadFromFile(filePath);
+		tiles[y][x].textureFilePath = filePath;
+		tiles[y][x].shape.setTexture(&tiles[y][x].texture);
+		tiles[y][x].shape.setFillColor(sf::Color::White);
+		tiles[y][x].shape.setOutlineThickness(0.6f);
+		tiles[y][x].type = type;
+	}
+	else
+	{
+		tiles[y][x].shape.setOutlineColor(sf::Color::White); // 기본 WALL 색깔
+		tiles[y][x].type = TileType::PASS;
+		tiles[y][x].shape.setFillColor(sf::Color::Black); // 배경색
+	}
 
 	switch (tiles[y][x].type)
 	{

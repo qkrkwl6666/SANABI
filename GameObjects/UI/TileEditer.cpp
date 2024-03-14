@@ -280,9 +280,13 @@ void TileEditer::Update(float dt)
 	}
 
 	// 마우스 좌클릭 할때만 Update
-	if (InputMgr::GetMouseButtonDown(sf::Mouse::Left) && !GetActiveTypeUI())
+	if (InputMgr::GetMouseButton(sf::Mouse::Left) && !GetActiveTypeUI())
 	{
-		TileMouseSelection();
+		TileMouseSelection(false);
+	}
+	else if (InputMgr::GetMouseButton(sf::Mouse::Right) && !GetActiveTypeUI())
+	{
+		TileMouseSelection(true);
 	}
 
 	// UI 배경 마우스 안에서만 Update
@@ -364,7 +368,7 @@ void TileEditer::HandleMouseSelection()
 	}
 }
 
-void TileEditer::TileMouseSelection()
+void TileEditer::TileMouseSelection(bool isRemove)
 {
 	screenPos = SCENE_MGR.GetCurrentScene()->UiToScreen((sf::Vector2f)mouse->GetPosition());
 	worldPos = SCENE_MGR.GetCurrentScene()->ScreenToWorld((sf::Vector2i)screenPos);
@@ -378,7 +382,7 @@ void TileEditer::TileMouseSelection()
 		return;
 	}
 
-	tileMap->SetTileTexture(tilePos.y, tilePos.x, tilePath , currentType);
+	tileMap->SetTileTexture(tilePos.y, tilePos.x, tilePath , currentType , isRemove);
 }
 
 void TileEditer::TileSetTexture(const std::string& filePath)

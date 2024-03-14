@@ -64,7 +64,7 @@ public:
 	void SetCheck(bool c);
 	void Draw(sf::RenderWindow& window) override;
 	void HandleMouseSelection(); // UI 마우스 선택
-	void TileMouseSelection(); // 타일 마우스 선택 이벤트
+	void TileMouseSelection(bool isRemove = false); // 타일 마우스 선택 이벤트
 	void TileTypeMouseSelection();
 	void TileSetTexture(const std::string& filePath);
 
