@@ -3,6 +3,7 @@
 #include "Frail.h"
 #include "Player.h"
 #include "SceneGame.h"
+#include "Grenade.h"
 
 BossMajor::BossMajor(const std::string& name) : Enemy(name)
 {
@@ -21,6 +22,7 @@ void BossMajor::Init()
 		(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetPlayer();
 
 	frail = new Frail("Frail" , this);
+	greande = new Grenade("Grenade", this);
 
 	frialAnimator = frail->GetAnimator();
 
@@ -47,6 +49,9 @@ void BossMajor::Init()
 	// Normal1_Attack
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Boss/Spr_BOSS_Major_Normal1_Attack.csv"));
 
+	// GRenades_Attack
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Boss/Spr_BOSS_Major_Melee1_Attack.csv"));
+
 	MajorPos.push_back({ 7380.f , 1710.f}); // LEFT DOWN
 	MajorPos.push_back({ 7585.f , 1310.f}); // LEFT TOP
 	MajorPos.push_back({ 8035.f , 1610.f}); // MID
@@ -62,12 +67,16 @@ void BossMajor::Init()
 void BossMajor::Reset()
 {
 	Enemy::Reset();
+	
 }
 
 void BossMajor::Update(float dt)
 {
 	Enemy::Update(dt);
+	
+
 	frail->Update(dt);
+	greande->Update(dt);
 
 	if (!animator->IsPlaying())
 	{
@@ -80,13 +89,13 @@ void BossMajor::Update(float dt)
 		case BossMajor::Status::NONE:
 			break;
 		case BossMajor::Status::IDLE:
-			if (GetPosition().x < player->GetPosition().x)
+			Flip();
+
+			idleDt += dt;
+			if (idleDt >= idleDuration)
 			{
-				SetFlipX(false);
-			}
-			else
-			{
-				SetFlipX(true);
+				currentStauts = static_cast<Status>(Utils::RandomRange(4, 7));
+				idleDt = 0.f;
 			}
 
 			if (InputMgr::GetKeyDown(sf::Keyboard::Num2))
@@ -105,6 +114,11 @@ void BossMajor::Update(float dt)
 			else if (InputMgr::GetKeyDown(sf::Keyboard::Num5))
 			{
 				currentStauts = Status::NORMAL1_ATTACK;
+			}
+
+			else if (InputMgr::GetKeyDown(sf::Keyboard::Num6))
+			{
+				currentStauts = Status::GRENADES_ATTACK;
 			}
 			break;
 		case BossMajor::Status::SPHERE_ATTACK:
@@ -129,6 +143,12 @@ void BossMajor::Update(float dt)
 				isRush_Attack = true;
 				animator->Play("Spr_BOSS_Major_RushReady");
 			}
+			else if (isRush_Attacking)
+			{
+				sf::Vector2f direction = { 0, 1 };
+				Utils::Normalize(direction);
+				Translate(direction * rushSpeed * dt);
+			}
 			break;
 
 		case BossMajor::Status::NORMAL1_ATTACK:
@@ -138,6 +158,16 @@ void BossMajor::Update(float dt)
 				animator->Play("Spr_BOSS_Major_Normal1_TeleportStart");
 			}
 			break;
+
+		case BossMajor::Status::GRENADES_ATTACK:
+			if (!isGrenades_Attack)
+			{
+				isGrenades_Attack = true;
+				animator->Play("Spr_BOSS_Major_Melee1_Attack");
+				greande->GrenadeAttack();
+			}
+			break;
+
 		default:
 
 			break;
@@ -148,6 +178,7 @@ void BossMajor::LateUpdate(float dt)
 {
 	Enemy::LateUpdate(dt);
 
+	greande->LateUpdate(dt);
 	frail->LateUpdate(dt);
 }
 
@@ -160,6 +191,7 @@ void BossMajor::Draw(sf::RenderWindow& window)
 {
 	Enemy::Draw(window);
 
+	greande->Draw(window);
 	frail->Draw(window);
 }
 
@@ -195,30 +227,13 @@ void BossMajor::SetAnimationEvent()
 	// **************************Move Event**************************
 	animator->AddEvent("Spr_BOSS_Major_Normal1_TeleportStart", 7, [this]()
 		{
-			switch (currentStauts)
-			{
-				case BossMajor::Status::MOVE:
-					{
-						MajorPosition random = static_cast<MajorPosition>(Utils::RandomRange(0, 5));
-						while (currentPosition == random)
-						{
+			RandomMove();
+		});
 
-							random = static_cast<MajorPosition>(Utils::RandomRange(0, 5));
-						}
-						currentPosition = random;
-						animator->Play("Spr_BOSS_Major_MoveEnd");
-						SetPosition(MajorPos[static_cast<int>(currentPosition)]);
-						isMove = false;
-						break;
-					}
-	
-				case BossMajor::Status::NORMAL1_ATTACK:
-					SetPosition({ player->GetPosition().x - 110 , player->GetPosition().y - 80 });
-					animator->Play("Spr_BOSS_Major_Normal1_Attack");
-					isMove = false;
-					break;
-			}
-
+	animator->AddEvent("Spr_BOSS_Major_MoveEnd", 9, [this]()
+		{
+			currentStauts = Status::IDLE;
+			isMove = false;
 		});
 
 	animator->AddEvent("Spr_BOSS_Major_RushReady", 9, [this]()
@@ -239,37 +254,99 @@ void BossMajor::SetAnimationEvent()
 			SetTexture("graphics/Enemy/Boss_Major/Spr_BOSS_Major_Idle.png");
 			SetOrigin(Origins::BC);
 
-			animator->Play("Spr_BOSS_Major_RushEndTeleport");
+			animator->Play("Spr_BOSS_Major_RushEnd");
 		});
 
 	animator->AddEvent("Spr_BOSS_Major_RushEndTeleport", 3, [this]()
 		{
-			SetPosition({ player->GetPosition().x ,  player->GetPosition().y - 100});
-			animator->Play("Spr_BOSS_Major_RushEnd");
+			currentStauts = Status::MOVE;
+			RandomMove();
+
+			isRush_Attack = false;
+			isMove = true;
 		});
 
 	animator->AddEvent("Spr_BOSS_Major_RushEnd", 7, [this]()
 		{
 			animator->Play("Spr_BOSS_Major_RushAttack");
+			SetPosition({ player->GetPosition().x ,  player->GetPosition().y - 200 });
+			isRush_Attacking = true;
 		});
 
 	animator->AddEvent("Spr_BOSS_Major_RushAttack", 4, [this]()
 		{
-			currentStauts = Status::MOVE;
-			isRush_Attack = false;
-			isMove = false;
+			animator->Play("Spr_BOSS_Major_RushEndTeleport");
+			isRush_Attacking = false;
 		});
 
 	// NormalAttack 1
-	animator->AddEvent("Spr_BOSS_Major_Normal1_Attack", 7, [this]()
+	animator->AddEvent("Spr_BOSS_Major_Normal1_Attack", 8, [this]()
+		{
+			
+			MajorPosition random = static_cast<MajorPosition>(Utils::RandomRange(0, 5));
+			while (currentPosition == random)
+			{
+				random = static_cast<MajorPosition>(Utils::RandomRange(0, 5));
+			}
+			currentPosition = random;
+			SetPosition(MajorPos[static_cast<int>(currentPosition)]);
+			isNormal1_Attack = false;
+			currentStauts = Status::IDLE;
+		});
+
+	// GRENADES_ATTACK
+
+	animator->AddEvent("Spr_BOSS_Major_Melee1_Attack", 6, [this]()
 		{
 			currentStauts = Status::MOVE;
-			isNormal1_Attack = false;
-			isMove = false;
+			isMove = true;
+			RandomMove();
+			isGrenades_Attack = false;
 		});
+
 
 }
 
 void BossMajor::RandomMove()
 {
+	switch (currentStauts)
+	{
+		case BossMajor::Status::MOVE:
+		{
+			MajorPosition random = static_cast<MajorPosition>(Utils::RandomRange(0, 5));
+			while (currentPosition == random)
+			{
+				random = static_cast<MajorPosition>(Utils::RandomRange(0, 5));
+			}
+			currentPosition = random;
+			animator->Play("Spr_BOSS_Major_MoveEnd");
+			SetPosition(MajorPos[static_cast<int>(currentPosition)]);
+			break;
+		}
+
+		case BossMajor::Status::NORMAL1_ATTACK:
+			if (GetFlipX())
+			{
+				SetPosition({ player->GetPosition().x + 110 , player->GetPosition().y - 80 });
+			}
+			else
+			{
+				SetPosition({ player->GetPosition().x - 110 , player->GetPosition().y - 80 });
+			}
+			animator->Play("Spr_BOSS_Major_Normal1_Attack");
+			//isMove = false;
+			break;
+	}
+}
+
+void BossMajor::Flip()
+{
+	if (GetPosition().x < player->GetPosition().x)
+	{
+		SetFlipX(false);
+	}
+	else
+	{
+		SetFlipX(true);
+	}
 }

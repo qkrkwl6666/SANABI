@@ -3,6 +3,7 @@
 
 class Frail;
 class Player;
+class Grenade;
 
 class BossMajor : public Enemy
 {
@@ -15,8 +16,9 @@ protected:
 		MOVE,
 		RUSH_ATTACK,
 		NORMAL1_ATTACK,
+		GRENADES_ATTACK,
 
-
+		COUNT,
 	};
 
 	enum class MajorPosition
@@ -34,15 +36,22 @@ protected:
 	Player* player = nullptr;
 	Frail* frail = nullptr;
 	Animator* frialAnimator = nullptr;
-
-	Status currentStauts = Status::NONE;
+	Grenade* greande = nullptr;
+	Status currentStauts = Status::IDLE;
 	
 	MajorPosition currentPosition;
+
+	float idleDt = 0.f;
+	float idleDuration = 2.f;
+
+	float rushSpeed = 300.f;
 
 	bool isSphere_Attack = false;
 	bool isMove = false;
 	bool isRush_Attack = false;
+	bool isRush_Attacking = false;
 	bool isNormal1_Attack = false;
+	bool isGrenades_Attack = false;
 
 public:
 	BossMajor(const std::string& name = "");
@@ -57,5 +66,7 @@ public:
 
 	void SetAnimationEvent();
 	void RandomMove();
+
+	void Flip();
 };
 

@@ -27,8 +27,8 @@ protected:
 	float moveTime = 10.f;
 
 	// 무기 상태 변환 
-	float moveIdleDt = 30.f;
-	float moveDuration = 30.f;
+	float moveIdleDt = 10.f;
+	float moveDuration = 15.f;
 
 	Status currentStatus = Status::IDLE;
 

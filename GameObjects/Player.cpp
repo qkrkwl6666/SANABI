@@ -72,6 +72,10 @@ void Player::Init()
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Charge_Dash/Player_Charge_Dash_Charge_Start.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Charge_Dash/Player_Charge_Dash_End_Ground.csv"));
 
+	// Attacked
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Damaged_Dash.csv"));
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Damaged.csv"));
+
 	/*auto* clip = animator->GetClip("Player_Run_Landing");
 	clip->fps = 30;*/
 	
@@ -109,6 +113,17 @@ void Player::Reset()
 			this->SetStatus(Status::IDLE);
 		});
 
+	//Player_Damaged_Dash
+
+	animator->AddEvent("Player_Damaged_Dash", 2, [this]()
+		{
+			std::cout << "Player_Damaged_Dash" << std::endl;
+			isAttacked = false;
+			currentStatus = Status::IDLE;
+
+			velocity.x = 1500;
+		});
+
 	//std::function<void()> funcInstance2 = std::bind(&Player::PlayerJumping, this);
 	//animator->AddEvent("Player_Falling", 2, funcInstance2);
 
@@ -140,6 +155,7 @@ void Player::Update(float dt)
 	weaponAnimator->Update(dt);
 	//std::cout << Falling << std::endl;
 	
+	std::cout << isAttacked << std::endl;
 	// TODO : 
 	// Status 만들고 상태에 따른 Update 해야하지만 보스 먼저 하고 나중에?
 	
@@ -153,6 +169,12 @@ void Player::Update(float dt)
 	//std::cout << animator->GetCurrentClipId() << std::endl;
 
 	float h = InputMgr::GetAxisRaw(Axis::Horizontal); // - 1 0 1
+
+	if (InputMgr::GetKeyDown(sf::Keyboard::Tab))
+	{
+		Attacked();
+
+	}
 
 	if (InputMgr::GetKeyDown(sf::Keyboard::LShift) && !isSwinging)
 	{
@@ -230,6 +252,18 @@ void Player::Update(float dt)
 		}
 		return;
 		break;
+	case Player::Status::ATTACKED:
+
+		if (!isAttacked)
+		{
+			isAttacked = true;
+			animator->Play("Player_Damaged");
+		}
+		else if (isAttacked && InputMgr::GetKeyDown(sf::Keyboard::Space))
+		{
+			FRAMEWORK.SetTimeScale(1.f);
+			animator->Play("Player_Damaged_Dash");
+		}
 	default:
 		break;
 	}
@@ -705,6 +739,27 @@ void Player::HandleSwingMotion(float dt, float speedFactor)
 	sf::Vector2f newPos = GetPosition() + velocity * dt;
 	sf::Vector2f correctedPos = ropeAnchorPoint + Utils::GetNormalize(newPos - ropeAnchorPoint) * ropeLength;
 	SetPosition(correctedPos);
+
+}
+
+void Player::Attacked()
+{
+	hp--;
+
+	if (hp <= 0)
+	{
+		hp = 0;
+		Dead();
+	}
+	else
+	{
+		FRAMEWORK.SetTimeScale(0.1f);
+		currentStatus = Status::ATTACKED;
+	}
+}
+
+void Player::Dead()
+{
 
 }
 

@@ -13,7 +13,7 @@ class Player : public SpriteGo
 	{
 		IDLE,
 		CHARGE_DESH,
-
+		ATTACKED,
 	};
 
 
@@ -22,6 +22,10 @@ protected:
 	Animator* weaponAnimator = nullptr;
 	Weapon* weapon = nullptr;
 	TileMap* tileMap = nullptr;
+
+	int hp = 5;
+	bool isAttacked = false;
+
 	std::list<Enemy*>* enemys;
 
 	float chargeDashSpeed = 1000.f;
@@ -92,6 +96,9 @@ public:
 
 	void PlayerAnimationPlay(const std::string& player,
 		const std::string& weapon, bool clearQueue = true);
+
+	void Attacked();
+	void Dead();
 
 	void PlayerShiftRolling();
 

@@ -32,6 +32,8 @@ void Frail::Init()
 
 	player = dynamic_cast<SceneGame*>
 		(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetPlayer();
+
+	SetActive(false);
 }
 
 void Frail::Reset()
