@@ -56,6 +56,9 @@ void BossMajor::Init()
 	// TakeDown
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/TakeDown/Major_TakeDown.csv"));
 
+	// DamagedKnockback
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Boss/Spr_BOSS_Major_DamagedKnockback.csv"));
+
 	MajorPos.push_back({ 7380.f , 1710.f}); // LEFT DOWN
 	MajorPos.push_back({ 7585.f , 1310.f}); // LEFT TOP
 	MajorPos.push_back({ 8035.f , 1610.f}); // MID
@@ -95,6 +98,14 @@ void BossMajor::Update(float dt)
 		//std::cout << animator->GetCurrentClipId() << std::endl;
 	}
 
+	if (InputMgr::GetKeyDown(sf::Keyboard::Num2))
+	{
+		currentStauts = Status::DAMAGED_KNOCK_BACK;
+	}
+	else if (InputMgr::GetKeyDown(sf::Keyboard::Num3))
+	{
+		currentStauts = Status::SPHERE_ATTACK;
+	}
 
 	switch (currentStauts)
 	{
@@ -103,41 +114,13 @@ void BossMajor::Update(float dt)
 		case BossMajor::Status::IDLE:
 			Flip();
 
-	/*		idleDt += dt;
+			idleDt += dt;
 			if (idleDt >= idleDuration)
 			{
 				currentStauts = static_cast<Status>(Utils::RandomRange(4, 7));
 				idleDt = 0.f;
-			}*/
-
-			if (InputMgr::GetKeyDown(sf::Keyboard::Num2))
-			{
-				currentStauts = Status::SPHERE_ATTACK;
 			}
-			else if (InputMgr::GetKeyDown(sf::Keyboard::Num3))
-			{
-				currentStauts = Status::MOVE;
-			}
-			else if (InputMgr::GetKeyDown(sf::Keyboard::Num4))
-			{
-				currentStauts = Status::RUSH_ATTACK;
-			}
-
-			else if (InputMgr::GetKeyDown(sf::Keyboard::Num5))
-			{
-				currentStauts = Status::NORMAL1_ATTACK;
-			}
-
-			else if (InputMgr::GetKeyDown(sf::Keyboard::Num6))
-			{
-				currentStauts = Status::GRENADES_ATTACK;
-			}
-
-			else if (InputMgr::GetKeyDown(sf::Keyboard::Num7))
-			{
-				currentStauts = Status::TAKE_DOWN;
-				player->SetCurrentStatus(Player::Status::TAKE_DOWN);
-			}
+			
 			break;
 		case BossMajor::Status::SPHERE_ATTACK:
 			if (!isSphere_Attack)
@@ -205,6 +188,29 @@ void BossMajor::Update(float dt)
 				isTakeDown = true;
 				animator->Play("Spr_BOSS_Major_TakeDown");
 			}
+			break;
+		case BossMajor::Status::DAMAGED_KNOCK_BACK:
+			if (!isDamagedKnockBack)
+			{
+				SetTexture("graphics/Enemy/Boss_Major/Spr_BOSS_Major_Idle.png");
+				SetOrigin(Origins::BC);
+
+				isDamagedKnockBack = true;
+				SkillCencle();
+				animator->Play("Spr_BOSS_Major_DamagedKnockback");
+			}
+			else if (isDamagedKnockBack)
+			{
+				sf::Vector2f dir = { 1 , 0 };
+				if (!GetFlipX())
+				{
+					dir.x *= -1;
+				}
+
+				Translate(dir * dt * KnockBackSpeed);
+
+			}
+			break;
 
 		default:
 
@@ -345,19 +351,18 @@ void BossMajor::SetAnimationEvent()
 	// TAKE_DOWN
 	animator->AddEvent("Spr_BOSS_Major_TakeDown", 15, [this]()
 		{
-			MajorPosition random = static_cast<MajorPosition>(Utils::RandomRange(0, 5));
-			while (currentPosition == random)
-			{
-				random = static_cast<MajorPosition>(Utils::RandomRange(0, 5));
-			}
-			currentPosition = random;
-			SetPosition(MajorPos[static_cast<int>(currentPosition)]);
-
-			currentStauts = Status::IDLE;
+			isMoving();
 			isTakeDown = false;
 		});
 
-
+	//DAMAGED_KNOCK_BACK
+	animator->AddEvent("Spr_BOSS_Major_DamagedKnockback", 15, [this]()
+		{
+			currentStauts = Status::MOVE;
+			isMove = true;
+			RandomMove();
+			isDamagedKnockBack = false;
+		});
 }
 
 void BossMajor::RandomMove()
@@ -392,6 +397,36 @@ void BossMajor::RandomMove()
 			//isMove = false;
 			break;
 	}
+}
+
+void BossMajor::isMoving()
+{
+	MajorPosition random = static_cast<MajorPosition>(Utils::RandomRange(0, 5));
+	while (currentPosition == random)
+	{
+		random = static_cast<MajorPosition>(Utils::RandomRange(0, 5));
+	}
+	currentPosition = random;
+	SetPosition(MajorPos[static_cast<int>(currentPosition)]);
+
+	currentStauts = Status::IDLE;
+}
+
+void BossMajor::SetCurrentStatus(Status status)
+{
+	currentStauts = status;
+}
+
+void BossMajor::SkillCencle()
+{
+	isSphere_Attack = false;
+	isMove = false;
+	isRush_Attack = false;
+	isRush_Attacking = false;
+	isNormal1_Attack = false;
+	isNormal1_Attacking = false;
+	isGrenades_Attack = false;
+	isTakeDown = false;
 }
 
 void BossMajor::Flip()

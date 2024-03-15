@@ -7,7 +7,7 @@ class Grenade;
 
 class BossMajor : public Enemy
 {
-protected:
+public:
 	enum class Status
 	{
 		NONE,
@@ -18,6 +18,7 @@ protected:
 		NORMAL1_ATTACK,
 		GRENADES_ATTACK,
 		TAKE_DOWN,
+		DAMAGED_KNOCK_BACK,
 		COUNT,
 	};
 
@@ -30,7 +31,7 @@ protected:
 		RIGHT_TOP,
 		COUNT,
 	};
-
+protected:
 	std::vector<sf::Vector2f> MajorPos;
 
 	Player* player = nullptr;
@@ -45,6 +46,7 @@ protected:
 	float idleDuration = 2.f;
 
 	float rushSpeed = 300.f;
+	float KnockBackSpeed = 50.f;
 
 	bool isSphere_Attack = false;
 	bool isMove = false;
@@ -54,6 +56,7 @@ protected:
 	bool isNormal1_Attacking = false;
 	bool isGrenades_Attack = false;
 	bool isTakeDown = false;
+	bool isDamagedKnockBack = false;
 
 public:
 	BossMajor(const std::string& name = "");
@@ -68,6 +71,11 @@ public:
 
 	void SetAnimationEvent();
 	void RandomMove();
+	void isMoving();
+
+	void SetCurrentStatus(Status status);
+
+	void SkillCencle();
 
 	void Flip();
 };

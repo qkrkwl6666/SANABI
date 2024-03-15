@@ -98,7 +98,6 @@ public:
 	// static void TestStatic();
 	// void TestInstance();
 
-	
 	void Init() override;
 	void Reset() override;
 	void Update(float dt) override;

@@ -257,6 +257,14 @@ void Player::Update(float dt)
 				(*CloseEnemy)->Dead();
 				
 			}
+			else if (Utils::Distance(GetPosition(), bossMajor->GetPosition()) < 500)
+			{
+				SetPosition(bossMajor->GetPosition());
+				SetRotation(Utils::Angle(bossMajor->GetPosition() - GetPosition()));
+				animator->Play("Player_Charge_Dash");
+				weaponAnimator->Play("Arm_Charge_Desh");
+				bossMajor->SetCurrentStatus(BossMajor::Status::DAMAGED_KNOCK_BACK);
+			}
 			else
 			{
 				// 공격 캔슬
@@ -422,14 +430,8 @@ void Player::LateUpdate(float dt)
 
 	if (InputMgr::GetMouseButtonDown(sf::Mouse::Left))
 	{
-		//PlayerEnemysCollisions(dt);
+		PlayerEnemysCollisions(dt);
 	}
-
-	//std::cout << GetPosition().y << std::endl;
-
-	// 공중에 있는 동안에는 타일 충돌 검사 수행
-	//PlayerTileCollisions(dt);
-
 }
 
 void Player::Draw(sf::RenderWindow& window)
@@ -566,7 +568,6 @@ bool Player::PlayerTileCollisions(float dt)
 void Player::PlayerEnemysCollisions(float dt)
 {
 	sf::Vector2i closestTileIndex(-1, -1); // 초기값을 유효하지 않은 인덱스로 설정
-	//float closestDistance = std::numeric_limits<float>::max();
 
 	// 마우스 위치에 대한 타일 좌표 계산
 	int mouseTileX = static_cast<int>(worldPos.x / tileMap->GetTileSize().x);
@@ -596,6 +597,14 @@ void Player::PlayerEnemysCollisions(float dt)
 					{
 						it++;
 					}
+				}
+
+				// 보스 처리
+				if (tileMap->GetTiles()[y][x].shape.getGlobalBounds().
+							contains(bossMajor->GetPosition()))
+				{
+					currentStatus = Status::TAKE_DOWN;
+					bossMajor->SetCurrentStatus(BossMajor::Status::TAKE_DOWN);
 				}
 
 			}
