@@ -131,6 +131,7 @@ void Player::Reset()
 	// TakeDown
 	animator->AddEvent("Spr_SNB_TakeDownByMajor", 9, [this]()
 		{
+			currentStatus = Status::ATTACKED;
 			isTakeDown = false;
 			Attacked();
 		});
@@ -168,13 +169,7 @@ void Player::Update(float dt)
 	animator->Update(dt);
 	weaponAnimator->Update(dt);
 	//std::cout << Falling << std::endl;
-	if (animator != nullptr)
-	{
-		std::cout << animator->GetCurrentClipId() << std::endl;
-	}
-	//std::cout << hp << std::endl;
-	//std::cout << isAttacked << std::endl;
-	// TODO : 
+
 	// Status 만들고 상태에 따른 Update 해야하지만 보스 먼저 하고 나중에?
 	
 	ScreenPos = SCENE_MGR.GetCurrentScene()->UiToScreen((sf::Vector2f)mouse->GetPosition());
@@ -226,9 +221,7 @@ void Player::Update(float dt)
 			InvincibleDt = 0.f;
 		}
 
-		std::cout << isSwinging << std::endl;
-		std::cout << isChargeDash << std::endl;
-		std::cout << isShiftRolling << std::endl;
+
 		// 점프 시작
 		if (InputMgr::GetKeyDown(sf::Keyboard::Space) && !isSwinging && !isChargeDash && !isShiftRolling)
 		{
@@ -286,6 +279,8 @@ void Player::Update(float dt)
 			FRAMEWORK.SetTimeScale(1.f);
 			animator->Play("Player_Damaged_Dash");
 		}
+		break;
+		return;
 
 	case Player::Status::TAKE_DOWN:
 		if (!isTakeDown)
@@ -795,7 +790,7 @@ void Player::Attacked()
 
 void Player::Dead()
 {
-
+	SCENE_MGR.ChangeScene(SceneIds::SceneTitle);
 }
 
 void Player::UpdateSwing(float dt)
