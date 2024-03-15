@@ -129,3 +129,8 @@ std::list<Enemy*>* SceneGame::GetEnemys()
 {
 	return &enemys;
 }
+
+BossMajor* SceneGame::GetBossMajor()
+{
+	return bossMajor;
+}

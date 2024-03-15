@@ -3,6 +3,7 @@
 #include "SpriteAnimatorGo.h"
 #include "SceneGame.h"
 #include "BossMajor.h"
+#include "Player.h"
 
 Grenade::Grenade(const std::string& name, BossMajor* bossMajor) 
 	: SpriteGo(name) , bossMajor(bossMajor)
@@ -95,6 +96,15 @@ void Grenade::Update(float dt)
 		data->Translate(gravity * dt * speed);
 		
 		data->Update(dt);
+
+		if (data->GetAnimator()->GetCurrentClipId() == "Spr_BOSS_Grenade_Explode")
+		{
+			if (data->GetGlobalBounds().intersects(player->GetGlobalBounds()) && !player->GetIsInvincible())
+			{
+				player->Attacked();
+			}
+		}
+
 	}
 }
 

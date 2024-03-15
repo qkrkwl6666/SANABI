@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "SceneGame.h"
 #include "Grenade.h"
+#include "BossMajor.h"
 
 BossMajor::BossMajor(const std::string& name) : Enemy(name)
 {
@@ -52,6 +53,9 @@ void BossMajor::Init()
 	// GRenades_Attack
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Boss/Spr_BOSS_Major_Melee1_Attack.csv"));
 
+	// TakeDown
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/TakeDown/Major_TakeDown.csv"));
+
 	MajorPos.push_back({ 7380.f , 1710.f}); // LEFT DOWN
 	MajorPos.push_back({ 7585.f , 1310.f}); // LEFT TOP
 	MajorPos.push_back({ 8035.f , 1610.f}); // MID
@@ -73,7 +77,8 @@ void BossMajor::Reset()
 void BossMajor::Update(float dt)
 {
 	Enemy::Update(dt);
-	
+
+
 
 	frail->Update(dt);
 	greande->Update(dt);
@@ -84,6 +89,13 @@ void BossMajor::Update(float dt)
 		currentStauts = Status::IDLE;
 	}
 
+
+	if (animator != nullptr)
+	{
+		//std::cout << animator->GetCurrentClipId() << std::endl;
+	}
+
+
 	switch (currentStauts)
 	{
 		case BossMajor::Status::NONE:
@@ -91,12 +103,12 @@ void BossMajor::Update(float dt)
 		case BossMajor::Status::IDLE:
 			Flip();
 
-			idleDt += dt;
+	/*		idleDt += dt;
 			if (idleDt >= idleDuration)
 			{
 				currentStauts = static_cast<Status>(Utils::RandomRange(4, 7));
 				idleDt = 0.f;
-			}
+			}*/
 
 			if (InputMgr::GetKeyDown(sf::Keyboard::Num2))
 			{
@@ -119,6 +131,12 @@ void BossMajor::Update(float dt)
 			else if (InputMgr::GetKeyDown(sf::Keyboard::Num6))
 			{
 				currentStauts = Status::GRENADES_ATTACK;
+			}
+
+			else if (InputMgr::GetKeyDown(sf::Keyboard::Num7))
+			{
+				currentStauts = Status::TAKE_DOWN;
+				player->SetCurrentStatus(Player::Status::TAKE_DOWN);
 			}
 			break;
 		case BossMajor::Status::SPHERE_ATTACK:
@@ -148,6 +166,11 @@ void BossMajor::Update(float dt)
 				sf::Vector2f direction = { 0, 1 };
 				Utils::Normalize(direction);
 				Translate(direction * rushSpeed * dt);
+
+				if (Utils::Distance(GetPosition(), player->GetPosition()) < 150 && !player->GetIsInvincible())
+				{
+					player->Attacked();
+				}
 			}
 			break;
 
@@ -156,6 +179,14 @@ void BossMajor::Update(float dt)
 			{
 				isNormal1_Attack = true;
 				animator->Play("Spr_BOSS_Major_Normal1_TeleportStart");
+			}
+
+			if (isNormal1_Attacking)
+			{
+				if (Utils::Distance(GetPosition(), player->GetPosition()) < 300 && !player->GetIsInvincible())
+				{
+					player->Attacked();
+				}
 			}
 			break;
 
@@ -167,6 +198,13 @@ void BossMajor::Update(float dt)
 				greande->GrenadeAttack();
 			}
 			break;
+
+		case BossMajor::Status::TAKE_DOWN:
+			if (!isTakeDown)
+			{
+				isTakeDown = true;
+				animator->Play("Spr_BOSS_Major_TakeDown");
+			}
 
 		default:
 
@@ -282,7 +320,6 @@ void BossMajor::SetAnimationEvent()
 	// NormalAttack 1
 	animator->AddEvent("Spr_BOSS_Major_Normal1_Attack", 8, [this]()
 		{
-			
 			MajorPosition random = static_cast<MajorPosition>(Utils::RandomRange(0, 5));
 			while (currentPosition == random)
 			{
@@ -292,6 +329,7 @@ void BossMajor::SetAnimationEvent()
 			SetPosition(MajorPos[static_cast<int>(currentPosition)]);
 			isNormal1_Attack = false;
 			currentStauts = Status::IDLE;
+			isNormal1_Attacking = false;
 		});
 
 	// GRENADES_ATTACK
@@ -302,6 +340,21 @@ void BossMajor::SetAnimationEvent()
 			isMove = true;
 			RandomMove();
 			isGrenades_Attack = false;
+		});
+
+	// TAKE_DOWN
+	animator->AddEvent("Spr_BOSS_Major_TakeDown", 15, [this]()
+		{
+			MajorPosition random = static_cast<MajorPosition>(Utils::RandomRange(0, 5));
+			while (currentPosition == random)
+			{
+				random = static_cast<MajorPosition>(Utils::RandomRange(0, 5));
+			}
+			currentPosition = random;
+			SetPosition(MajorPos[static_cast<int>(currentPosition)]);
+
+			currentStauts = Status::IDLE;
+			isTakeDown = false;
 		});
 
 
@@ -325,6 +378,7 @@ void BossMajor::RandomMove()
 		}
 
 		case BossMajor::Status::NORMAL1_ATTACK:
+
 			if (GetFlipX())
 			{
 				SetPosition({ player->GetPosition().x + 110 , player->GetPosition().y - 80 });
@@ -334,6 +388,7 @@ void BossMajor::RandomMove()
 				SetPosition({ player->GetPosition().x - 110 , player->GetPosition().y - 80 });
 			}
 			animator->Play("Spr_BOSS_Major_Normal1_Attack");
+			isNormal1_Attacking = true;
 			//isMove = false;
 			break;
 	}

@@ -88,9 +88,9 @@ void Frail::LateUpdate(float dt)
 {
 	SpriteGo::LateUpdate(dt);
 
-	if (GetGlobalBounds().intersects(player->GetGlobalBounds()))
+	if (GetGlobalBounds().intersects(player->GetGlobalBounds()) && !player->GetIsInvincible())
 	{
-		std::cout << "Frail Ãæµ¹ !!" << std::endl;
+		player->Attacked();
 	}
 }
 

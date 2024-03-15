@@ -8,6 +8,7 @@
 #include "Crosshair.h"
 #include "Enemy.h"
 #include "Enemy_RifleMan.h"
+#include "BossMajor.h"
 
 Player::Player(const std::string& name)
 	:SpriteGo(name)
@@ -76,6 +77,9 @@ void Player::Init()
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Damaged_Dash.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Player_Damaged.csv"));
 
+	// TakeDown
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/TakeDown/Player_TakeDown.csv"));
+
 	/*auto* clip = animator->GetClip("Player_Run_Landing");
 	clip->fps = 30;*/
 	
@@ -120,9 +124,18 @@ void Player::Reset()
 			std::cout << "Player_Damaged_Dash" << std::endl;
 			isAttacked = false;
 			currentStatus = Status::IDLE;
-
-			velocity.x = 1500;
+			InvincibleDt = 0.f;
+			//velocity.x = 1500;
 		});
+
+	// TakeDown
+	animator->AddEvent("Spr_SNB_TakeDownByMajor", 9, [this]()
+		{
+			isTakeDown = false;
+			Attacked();
+		});
+
+	//Spr_SNB_TakeDownByMajor
 
 	//std::function<void()> funcInstance2 = std::bind(&Player::PlayerJumping, this);
 	//animator->AddEvent("Player_Falling", 2, funcInstance2);
@@ -135,6 +148,7 @@ void Player::Reset()
 
 	tileMap = dynamic_cast<SceneGame*>(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetTileMap();
 	enemys = dynamic_cast<SceneGame*>(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetEnemys();
+	bossMajor = dynamic_cast<SceneGame*>(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetBossMajor();
 
 	weaponAnimator = weapon->GetAnimator();
 
@@ -154,8 +168,12 @@ void Player::Update(float dt)
 	animator->Update(dt);
 	weaponAnimator->Update(dt);
 	//std::cout << Falling << std::endl;
-	
-	std::cout << isAttacked << std::endl;
+	if (animator != nullptr)
+	{
+		std::cout << animator->GetCurrentClipId() << std::endl;
+	}
+	//std::cout << hp << std::endl;
+	//std::cout << isAttacked << std::endl;
 	// TODO : 
 	// Status 만들고 상태에 따른 Update 해야하지만 보스 먼저 하고 나중에?
 	
@@ -169,12 +187,6 @@ void Player::Update(float dt)
 	//std::cout << animator->GetCurrentClipId() << std::endl;
 
 	float h = InputMgr::GetAxisRaw(Axis::Horizontal); // - 1 0 1
-
-	if (InputMgr::GetKeyDown(sf::Keyboard::Tab))
-	{
-		Attacked();
-
-	}
 
 	if (InputMgr::GetKeyDown(sf::Keyboard::LShift) && !isSwinging)
 	{
@@ -206,6 +218,17 @@ void Player::Update(float dt)
 	switch (currentStatus)
 	{
 	case Player::Status::IDLE:
+		if (isInvincible)
+			InvincibleDt += dt;
+		if (InvincibleDt >= InvincibleDuration && isInvincible)
+		{
+			isInvincible = false;
+			InvincibleDt = 0.f;
+		}
+
+		std::cout << isSwinging << std::endl;
+		std::cout << isChargeDash << std::endl;
+		std::cout << isShiftRolling << std::endl;
 		// 점프 시작
 		if (InputMgr::GetKeyDown(sf::Keyboard::Space) && !isSwinging && !isChargeDash && !isShiftRolling)
 		{
@@ -253,7 +276,6 @@ void Player::Update(float dt)
 		return;
 		break;
 	case Player::Status::ATTACKED:
-
 		if (!isAttacked)
 		{
 			isAttacked = true;
@@ -264,6 +286,15 @@ void Player::Update(float dt)
 			FRAMEWORK.SetTimeScale(1.f);
 			animator->Play("Player_Damaged_Dash");
 		}
+
+	case Player::Status::TAKE_DOWN:
+		if (!isTakeDown)
+		{
+			isTakeDown = true;
+			SetPosition(bossMajor->GetPosition());
+			animator->Play("Spr_SNB_TakeDownByMajor");
+		}
+		return;
 	default:
 		break;
 	}
@@ -744,7 +775,11 @@ void Player::HandleSwingMotion(float dt, float speedFactor)
 
 void Player::Attacked()
 {
-	hp--;
+	if (!isAttacked && !isInvincible)
+	{
+		hp--;
+		isInvincible = true;
+	}
 
 	if (hp <= 0)
 	{

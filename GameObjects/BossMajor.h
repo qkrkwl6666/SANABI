@@ -17,7 +17,7 @@ protected:
 		RUSH_ATTACK,
 		NORMAL1_ATTACK,
 		GRENADES_ATTACK,
-
+		TAKE_DOWN,
 		COUNT,
 	};
 
@@ -51,7 +51,9 @@ protected:
 	bool isRush_Attack = false;
 	bool isRush_Attacking = false;
 	bool isNormal1_Attack = false;
+	bool isNormal1_Attacking = false;
 	bool isGrenades_Attack = false;
+	bool isTakeDown = false;
 
 public:
 	BossMajor(const std::string& name = "");

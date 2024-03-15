@@ -6,25 +6,35 @@ class Weapon;
 class TileMap;
 class Crosshair;
 class Enemy;
+class BossMajor;
 
 class Player : public SpriteGo
 {
+public:
 	enum class Status
 	{
 		IDLE,
 		CHARGE_DESH,
 		ATTACKED,
-	};
+		TAKE_DOWN,
 
+	};
 
 protected:
 	Animator* animator = nullptr;
 	Animator* weaponAnimator = nullptr;
 	Weapon* weapon = nullptr;
 	TileMap* tileMap = nullptr;
+	BossMajor* bossMajor = nullptr;
 
 	int hp = 5;
 	bool isAttacked = false;
+	bool isInvincible = false;
+
+	bool isTakeDown = false;
+
+	float InvincibleDt = 0.f;
+	float InvincibleDuration = 3.f;
 
 	std::list<Enemy*>* enemys;
 
@@ -88,6 +98,7 @@ public:
 	// static void TestStatic();
 	// void TestInstance();
 
+	
 	void Init() override;
 	void Reset() override;
 	void Update(float dt) override;
@@ -99,7 +110,7 @@ public:
 
 	void Attacked();
 	void Dead();
-
+	bool GetIsInvincible() { return isInvincible; }
 	void PlayerShiftRolling();
 
 	void PlayerJumping();
@@ -123,6 +134,7 @@ public:
 	void SetStatus(Status status) { currentStatus = status;}
 	void SetChargeDash(bool value = false) {isChargeDash = value;}
 
+	void SetCurrentStatus(Status stat) { currentStatus = stat; }
 	void ClampVelocity(sf::Vector2f& velocity, float minY, float maxY)
 	{
 		velocity.y = std::max(minY, std::min(velocity.y, maxY));

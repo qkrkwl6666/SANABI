@@ -44,5 +44,6 @@ public:
 	Player* GetPlayer();
 	TileMap* GetTileMap();
 	std::list<Enemy*>* GetEnemys();
+	BossMajor* GetBossMajor();
 };
 
