@@ -40,11 +40,16 @@ protected:
 
 	float chargeDashSpeed = 1000.f;
 
+	float chargeDashDt = 0.f;
+	float chargeDashDuration = 1.f;
+
 	Status currentStatus = Status::IDLE;
 
 	Crosshair* mouse = FRAMEWORK.GetMouse();
 
 	sf::Vector2f WeaponPoint;
+
+	sf::Vector2i PreviewRope = { -1 , -1 };
 
 	float gravity = 800.f;
 	float speed = 500.f;
@@ -57,6 +62,7 @@ protected:
 	bool isSwingingAnimation = false;
 	bool isShiftRolling = false;
 	bool isChargeDash = false;
+	bool isChargeDashing = false;
 
 	bool isCollisions = false;
 
@@ -107,6 +113,8 @@ public:
 	void PlayerAnimationPlay(const std::string& player,
 		const std::string& weapon, bool clearQueue = true);
 
+	sf::Vector2i PreviewRopeFind();
+
 	void Attacked();
 	void Dead();
 	bool GetIsInvincible() { return isInvincible; }
@@ -125,7 +133,10 @@ public:
 
 	bool IsSwinging() {return isSwinging;}
 
+	void SkillCencle();
+
 	sf::Vector2i FindClosestTile();
+
 
 	void HandleSwingMotion(float dt, float speedFactor);
 

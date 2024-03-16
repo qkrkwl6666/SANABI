@@ -97,6 +97,8 @@ void Player::Reset()
 		{
 			std::cout << "ChargeDash!!" << std::endl;
 
+			weapon->SetTexture("graphics/player/Charge_Dash/Charge_Desh/Arm_Charge_Desh_Loop/Spr_SNBArm_ChargeDashChargeLoop (lp) (1).png");
+			weapon->SetOrigin(Origins::ML);
 			animator->Play("Player_Charge_Dash_Charge_Loop");
 			weaponAnimator->Play("Arm_Charge_Dash_Charge_Loop");
 		});
@@ -113,6 +115,8 @@ void Player::Reset()
 		{
 			std::cout << "Player_Charge_Attack Finish!!" << std::endl;
 
+			weapon->SetTexture("graphics/Spr_SNBArm.png");
+			weapon->SetOrigin(Origins::MC);
 			this->SetChargeDash(false);
 			this->SetStatus(Status::IDLE);
 		});
@@ -168,8 +172,12 @@ void Player::Update(float dt)
 	SpriteGo::Update(dt);
 	animator->Update(dt);
 	weaponAnimator->Update(dt);
-	//std::cout << Falling << std::endl;
 
+
+	//std::cout << PreviewRopeFind().x << std::endl;
+	//std::cout << PreviewRopeFind().y << std::endl;
+
+	
 	// Status 만들고 상태에 따른 Update 해야하지만 보스 먼저 하고 나중에?
 	
 	ScreenPos = SCENE_MGR.GetCurrentScene()->UiToScreen((sf::Vector2f)mouse->GetPosition());
@@ -185,6 +193,8 @@ void Player::Update(float dt)
 
 	if (InputMgr::GetKeyDown(sf::Keyboard::LShift) && !isSwinging)
 	{
+		weapon->SetTexture("graphics/player/Charge_Dash/Charge_Desh/Arm_Charge_Desh_Start/Spr_SNBArm_ChargeDashChargeStart (1).png");
+		weapon->SetOrigin(Origins::MC);
 		isChargeDash = true;
 		currentStatus = Status::CHARGE_DESH;
 		animator->Play("Player_Charge_Dash_Charge_Start");
@@ -196,13 +206,13 @@ void Player::Update(float dt)
 	{
 		if (InputMgr::GetKey(sf::Keyboard::A) && InputMgr::GetKey(sf::Keyboard::LShift))
 		{
-			velocity.y = -500;
-			velocity.x = -1500;
+			velocity.y = -300;
+			velocity.x = -1000;
 		}
 		else if (InputMgr::GetKey(sf::Keyboard::D) && InputMgr::GetKey(sf::Keyboard::LShift))
 		{
-			velocity.y = -500;
-			velocity.x = +1500;
+			velocity.y = -300;
+			velocity.x = +1000;
 		}
 		//if (InputMgr::GetKeyDown(sf::Keyboard::Space))
 		//{
@@ -233,6 +243,7 @@ void Player::Update(float dt)
 		break;
 	case Player::Status::CHARGE_DESH:
 		// 중력 작용 안받음
+		chargeDashDt += dt;
 		velocity = { 0 , 0 };
 		weapon->SetPosition(GetPosition() + WeaponPoint);
 		if (InputMgr::GetKeyUp(sf::Keyboard::LShift))
@@ -257,8 +268,10 @@ void Player::Update(float dt)
 				(*CloseEnemy)->Dead();
 				
 			}
-			else if (Utils::Distance(GetPosition(), bossMajor->GetPosition()) < 500)
+			else if (Utils::Distance(GetPosition(), bossMajor->GetPosition()) < 500 
+				&& chargeDashDt >= chargeDashDuration)
 			{
+				chargeDashDt = 0.f;
 				SetPosition(bossMajor->GetPosition());
 				SetRotation(Utils::Angle(bossMajor->GetPosition() - GetPosition()));
 				animator->Play("Player_Charge_Dash");
@@ -268,6 +281,9 @@ void Player::Update(float dt)
 			else
 			{
 				// 공격 캔슬
+				weapon->SetTexture("graphics/Spr_SNBArm.png");
+				weapon->SetOrigin(Origins::MC);
+				chargeDashDt = 0.f;
 				animator->Play("Player_Charge_Dash_Charge_End");
 				weaponAnimator->Play("Arm_ChargeDashChargeEnd.png");
 				isChargeDash = false;
@@ -280,6 +296,7 @@ void Player::Update(float dt)
 		if (!isAttacked)
 		{
 			isAttacked = true;
+			SkillCencle();
 			animator->Play("Player_Damaged");
 		}
 		else if (isAttacked && InputMgr::GetKeyDown(sf::Keyboard::Space))
@@ -428,10 +445,15 @@ void Player::LateUpdate(float dt)
 {
 	SpriteGo::LateUpdate(dt);
 
+	ScreenPos = SCENE_MGR.GetCurrentScene()->UiToScreen((sf::Vector2f)mouse->GetPosition());
+	worldPos = SCENE_MGR.GetCurrentScene()->ScreenToWorld((sf::Vector2i)ScreenPos);
+
 	if (InputMgr::GetMouseButtonDown(sf::Mouse::Left))
 	{
 		PlayerEnemysCollisions(dt);
 	}
+
+	PreviewRope = PreviewRopeFind();
 }
 
 void Player::Draw(sf::RenderWindow& window)
@@ -444,17 +466,51 @@ void Player::Draw(sf::RenderWindow& window)
 		sf::VertexArray ropeLine(sf::Lines, 2);
 		ropeLine[0].position = sf::Vector2f(ropeAnchorPoint);
 		ropeLine[1].position = GetPosition();
+		ropeLine[0].color = sf::Color::Green;
+		ropeLine[1].color = sf::Color::Green;
+
+		window.draw(ropeLine);
+	}
+	else if (PreviewRope.x != -1 && PreviewRope.y != -1)
+	{
+		sf::VertexArray ropeLine(sf::Lines, 2);
+		ropeLine[0].position = sf::Vector2f(PreviewRope);
+		ropeLine[1].position = GetPosition();
 		ropeLine[0].color = sf::Color::White;
 		ropeLine[1].color = sf::Color::White;
 
 		window.draw(ropeLine);
+
 	}
+
 }
 
 void Player::PlayerAnimationPlay(const std::string& player, const std::string& weapon, bool clearQueue)
 {
 	animator->Play(player , clearQueue);
 	weaponAnimator->Play(weapon , clearQueue);
+}
+
+sf::Vector2i Player::PreviewRopeFind()
+{
+	sf::Vector2i closestTileIndex(-1, -1); 
+
+	int x = static_cast<int>(worldPos.x / tileMap->GetTileSize().x);
+	int y = static_cast<int>(worldPos.y / tileMap->GetTileSize().y);
+
+	if (tileMap->GetTiles()[y][x].type == TileMap::TileType::WALL)
+	{
+		x *= 50;
+		y *= 50;
+		closestTileIndex = { x , y };
+		return closestTileIndex;
+	}
+	else
+	{
+		return closestTileIndex;
+	}
+	
+
 }
 
 void Player::PlayerShiftRolling()
@@ -704,6 +760,13 @@ void Player::StartSwing(sf::Vector2i tilePosition)
 	swingDirection = 0; // 스윙 방향 초기화
 }
 
+void Player::SkillCencle()
+{
+	isShiftRolling = false;
+	isChargeDash = false;
+	isShift = false;
+}
+
 sf::Vector2i Player::FindClosestTile()
 {
 	sf::Vector2i closestTileIndex(-1, -1); // 초기값을 유효하지 않은 인덱스로 설정
@@ -721,6 +784,11 @@ sf::Vector2i Player::FindClosestTile()
 			// 검사 범위가 타일맵 내에 있는지 확인
 			if (x >= 0 && x < tileMap->GetMapSize().x && y >= 0 && y < tileMap->GetMapSize().y)
 			{
+				if (tileMap->GetTiles()[y][x].type == TileMap::TileType::WALLNOGRAB || 
+					tileMap->GetTiles()[y][x].type == TileMap::TileType::PASS)
+				{
+					continue;
+				}
 				// PASS가 아닌 타일에만 로프를 걸 수 있음
 				auto it = enemys->begin();
 

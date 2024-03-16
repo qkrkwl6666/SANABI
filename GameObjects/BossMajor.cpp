@@ -81,8 +81,6 @@ void BossMajor::Update(float dt)
 {
 	Enemy::Update(dt);
 
-
-
 	frail->Update(dt);
 	greande->Update(dt);
 
@@ -90,12 +88,6 @@ void BossMajor::Update(float dt)
 	{
 		animator->Play("Spr_BOSS_Major_Idle");
 		currentStauts = Status::IDLE;
-	}
-
-
-	if (animator != nullptr)
-	{
-		//std::cout << animator->GetCurrentClipId() << std::endl;
 	}
 
 	if (InputMgr::GetKeyDown(sf::Keyboard::Num2))
