@@ -149,7 +149,7 @@ void BossMajor::Update(float dt)
 			else if (isRush_Attacking)
 			{
 				sf::Vector2f direction = { 0, 1 };
-				Utils::Normalize(direction);
+
 				Translate(direction * rushSpeed * dt);
 
 				if (Utils::Distance(GetPosition(), player->GetPosition()) < 150 && !player->GetIsInvincible())

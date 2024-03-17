@@ -232,7 +232,6 @@ void Player::Update(float dt)
 			InvincibleDt = 0.f;
 		}
 
-
 		// 점프 시작
 		if (InputMgr::GetKeyDown(sf::Keyboard::Space) && !isSwinging && !isChargeDash && !isShiftRolling)
 		{
@@ -888,18 +887,6 @@ void Player::UpdateSwing(float dt)
 
 	sf::Vector2f anchorToPoint = GetPosition() - ropeAnchorPoint;
 	float angle = atan2(anchorToPoint.y, anchorToPoint.x);
-
-	// 플레이어 입력에 따른 스윙 가속도 조절
-	//if (InputMgr::GetKeyDown(sf::Keyboard::A))
-	//{
-	//	swingAcceleration -= swingForce * dt; // 왼쪽으로 스윙 가속
-	//	swingDirection = -1;
-	//}
-	//else if (InputMgr::GetKeyDown(sf::Keyboard::D))
-	//{
-	//	swingAcceleration += swingForce * dt; // 오른쪽으로 스윙 가속
-	//	swingDirection = 1;
-	//}
 
 	// 스윙 방향에 따라 위치 업데이트
 	float swingSpeed = swingAcceleration * swingDirection;

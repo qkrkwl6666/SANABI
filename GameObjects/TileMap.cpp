@@ -297,12 +297,6 @@ void TileMap::LoadTileMap(const std::string& filePath ,const float setOutlineThi
 		TileType type = static_cast<TileType>(tileObject["type"].GetInt());
 		std::string textureFilePath = tileObject["texture FilePath"].GetString();
 
-		//TCHAR str_currentPath[1024];
-
-		//GetCurrentDirectory(1024, str_currentPath);
-
-		//std::cout << str_currentPath << std::endl;
-
 		tiles[y][x] = Tile(sf::Vector2f(x * tileSize.x, y * tileSize.y), tileSize, (int)type);
 		tiles[y][x].textureFilePath = textureFilePath;
 
