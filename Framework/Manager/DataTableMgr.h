@@ -1,0 +1,42 @@
+#pragma once
+#include "Singleton.h"
+#include "DataTable.h"
+
+class DataTableMgr : public Singleton<DataTableMgr>
+{
+	friend Singleton<DataTableMgr>;
+private:
+	DataTableMgr();
+	~DataTableMgr();
+	DataTableMgr(const DataTableMgr&) = delete;
+	DataTableMgr(DataTableMgr&&) = delete;
+	DataTableMgr& operator=(const DataTableMgr&) = delete;
+	DataTableMgr& operator=(DataTableMgr&&) = delete;
+
+	std::unordered_map<DataTable::Types, DataTable*> tables;
+
+public:
+	void Init();
+	void Release();
+
+	template<typename T>
+	T* Get(DataTable::Types type);
+
+
+};
+
+template<typename T>
+inline T* DataTableMgr::Get(DataTable::Types type)
+{
+
+	auto find = tables.find(type);
+	if (find == tables.end())
+	{
+		return nullptr;
+	}
+
+	return dynamic_cast<T*>(find->second);
+}
+
+#define DT_MGR (DataTableMgr::Instance())
+
