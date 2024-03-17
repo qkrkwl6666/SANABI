@@ -60,7 +60,6 @@ public:
 	size_t GetPlayingCount() { return playing.size(); }
 	size_t GetWaitingCount() { return waiting.size(); }
 
-
 	void NewPlayBGM(std::string id, bool crossFade = true);
 	void NewFading(float dt);
 

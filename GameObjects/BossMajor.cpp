@@ -59,6 +59,9 @@ void BossMajor::Init()
 	// DamagedKnockback
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Boss/Spr_BOSS_Major_DamagedKnockback.csv"));
 
+	// ChangePage
+	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Boss/Spr_BOSS_Major_ChangePage.csv"));
+
 	MajorPos.push_back({ 7380.f , 1710.f}); // LEFT DOWN
 	MajorPos.push_back({ 7585.f , 1310.f}); // LEFT TOP
 	MajorPos.push_back({ 8035.f , 1610.f}); // MID
@@ -80,8 +83,12 @@ void BossMajor::Reset()
 void BossMajor::Update(float dt)
 {
 	Enemy::Update(dt);
+	
+	if (frail->GetActive())
+	{
+		frail->Update(dt);
+	}
 
-	frail->Update(dt);
 	greande->Update(dt);
 
 	if (!animator->IsPlaying())
@@ -92,11 +99,11 @@ void BossMajor::Update(float dt)
 
 	if (InputMgr::GetKeyDown(sf::Keyboard::Num2))
 	{
-		currentStauts = Status::DAMAGED_KNOCK_BACK;
+		currentStauts = Status::SPHERE_ATTACK;
 	}
 	else if (InputMgr::GetKeyDown(sf::Keyboard::Num3))
 	{
-		currentStauts = Status::SPHERE_ATTACK;
+		currentStauts = Status::CHANGE_PAGE;
 	}
 
 	switch (currentStauts)
@@ -106,11 +113,14 @@ void BossMajor::Update(float dt)
 		case BossMajor::Status::IDLE:
 			Flip();
 
-			idleDt += dt;
-			if (idleDt >= idleDuration)
+			if (isFight)
 			{
-				currentStauts = static_cast<Status>(Utils::RandomRange(4, 7));
-				idleDt = 0.f;
+				idleDt += dt;
+				if (idleDt >= idleDuration)
+				{
+					currentStauts = static_cast<Status>(Utils::RandomRange(4, 7));
+					idleDt = 0.f;
+				}
 			}
 			
 			break;
@@ -188,7 +198,15 @@ void BossMajor::Update(float dt)
 				SetOrigin(Origins::BC);
 
 				isDamagedKnockBack = true;
+				hp--;
 				SkillCencle();
+				if (hp <= 0)
+				{
+					currentStauts = Status::CHANGE_PAGE;
+					frail->SetActive(false);
+					isDamagedKnockBack = false;
+					break;
+				}
 				animator->Play("Spr_BOSS_Major_DamagedKnockback");
 			}
 			else if (isDamagedKnockBack)
@@ -201,6 +219,15 @@ void BossMajor::Update(float dt)
 
 				Translate(dir * dt * KnockBackSpeed);
 
+			}
+			break;
+		//Spr_BOSS_Major_ChangePage
+
+		case BossMajor::Status::CHANGE_PAGE:
+			if (!isChangePage)
+			{
+				isChangePage = true;
+				animator->Play("Spr_BOSS_Major_ChangePage");
 			}
 			break;
 
@@ -225,10 +252,14 @@ void BossMajor::Dead()
 
 void BossMajor::Draw(sf::RenderWindow& window)
 {
-	Enemy::Draw(window);
-
 	greande->Draw(window);
-	frail->Draw(window);
+
+	if (frail->GetActive())
+	{
+		frail->Draw(window);
+	}
+
+	Enemy::Draw(window);
 }
 
 void BossMajor::SetAnimationEvent()
@@ -255,6 +286,7 @@ void BossMajor::SetAnimationEvent()
 			SetOrigin(Origins::BC);
 
 			frail->SetPosition(GetPosition());
+			frail->SetActive(true);
 			frialAnimator->Play("Spr_Frail_SpinLoop");
 			isSphere_Attack = false;
 			currentStauts = Status::IDLE;
@@ -354,6 +386,13 @@ void BossMajor::SetAnimationEvent()
 			isMove = true;
 			RandomMove();
 			isDamagedKnockBack = false;
+		});
+
+	//CHANGE_PAGE
+	animator->AddEvent("Spr_BOSS_Major_ChangePage", 67, [this]()
+		{
+			SkillCencle();
+			SCENE_MGR.ChangeScene(SceneIds::SceneTitle);
 		});
 }
 

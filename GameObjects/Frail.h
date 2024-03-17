@@ -18,7 +18,7 @@ protected:
 	Animator* animator = nullptr;
 	Player* player = nullptr;
 	BossMajor* bossMajor = nullptr;
-	float moveSpeed = 300.f;
+	float moveSpeed = 100.f;
 
 	sf::Vector2f direction;
 

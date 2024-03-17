@@ -113,7 +113,7 @@ void UITitle::SetCheck(bool c)
 
 void UITitle::HandleMouseSelection()
 {
-	// TODO : 하드코딩 변경해야함
+
 	for (int i = 0; i < selectBoxs.size(); i++)
 	{
 		if (selectBoxs[i]->GetGlobalBounds().contains(mouse->GetPosition()))

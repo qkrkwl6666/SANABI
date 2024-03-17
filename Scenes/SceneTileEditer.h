@@ -10,7 +10,7 @@ class SceneTileEditer : public Scene
 protected:
 	TileMap* tileMap;
 	TileEditer* tileEditer;
-
+	
 
 public:
 	SceneTileEditer(const SceneTileEditer&) = delete;

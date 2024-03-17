@@ -30,8 +30,7 @@ void Frail::Init()
 
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Boss/Spr_Frail_SpinLoop.csv"));
 
-	player = dynamic_cast<SceneGame*>
-		(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetPlayer();
+	player = dynamic_cast<SceneGame*>(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetPlayer();
 
 	SetActive(false);
 }
@@ -39,6 +38,8 @@ void Frail::Init()
 void Frail::Reset()
 {
 	SpriteGo::Reset();
+
+	SetActive(false);
 }
 
 void Frail::Update(float dt)
@@ -46,7 +47,7 @@ void Frail::Update(float dt)
 	SpriteGo::Update(dt);
 
 	animator->Update(dt);
-	
+
 	switch (currentStatus)
 	{
 		case Frail::Status::NONE:

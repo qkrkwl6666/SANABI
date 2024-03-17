@@ -95,7 +95,7 @@ void Player::Reset()
 
 	animator->AddEvent("Player_Charge_Dash_Charge_Start", 21, [this]()
 		{
-			std::cout << "ChargeDash!!" << std::endl;
+			//std::cout << "ChargeDash!!" << std::endl;
 
 			weapon->SetTexture("graphics/player/Charge_Dash/Charge_Desh/Arm_Charge_Desh_Loop/Spr_SNBArm_ChargeDashChargeLoop (lp) (1).png");
 			weapon->SetOrigin(Origins::ML);
@@ -105,7 +105,7 @@ void Player::Reset()
 
 	animator->AddEvent("Player_Charge_Dash", 9, [this]()
 		{
-			std::cout << "ChargeDash Attack!!" << std::endl;
+			//std::cout << "ChargeDash Attack!!" << std::endl;
 
 			animator->Play("Player_Charge_Attack");
 			weaponAnimator->Play("Arm_Charge_Attack");
@@ -113,7 +113,7 @@ void Player::Reset()
 
 	animator->AddEvent("Player_Charge_Attack", 8, [this]()
 		{
-			std::cout << "Player_Charge_Attack Finish!!" << std::endl;
+			//std::cout << "Player_Charge_Attack Finish!!" << std::endl;
 
 			weapon->SetTexture("graphics/Spr_SNBArm.png");
 			weapon->SetOrigin(Origins::MC);
@@ -125,7 +125,7 @@ void Player::Reset()
 
 	animator->AddEvent("Player_Damaged_Dash", 2, [this]()
 		{
-			std::cout << "Player_Damaged_Dash" << std::endl;
+			//std::cout << "Player_Damaged_Dash" << std::endl;
 			isAttacked = false;
 			currentStatus = Status::IDLE;
 			InvincibleDt = 0.f;
@@ -156,7 +156,7 @@ void Player::Reset()
 	bossMajor = dynamic_cast<SceneGame*>(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetBossMajor();
 
 	weaponAnimator = weapon->GetAnimator();
-
+	sortLayer = 22;
 	animator->Play("Player_Idle");
 	weaponAnimator->Play("Player_Arm_Idle");
 
@@ -164,7 +164,8 @@ void Player::Reset()
 	
 	weapon->SetPosition(WeaponPoint);
 
-	SetPosition({ 8200.f , 1550.f });
+	SetPosition({ 180.f , 1900.f });
+	//SetPosition({ 8000.f , 1500.f });
 }
 
 void Player::Update(float dt)
@@ -173,18 +174,17 @@ void Player::Update(float dt)
 	animator->Update(dt);
 	weaponAnimator->Update(dt);
 
-
 	//std::cout << PreviewRopeFind().x << std::endl;
 	//std::cout << PreviewRopeFind().y << std::endl;
 
-	
+	std::cout << hp << std::endl;
 	// Status 만들고 상태에 따른 Update 해야하지만 보스 먼저 하고 나중에?
 	
 	ScreenPos = SCENE_MGR.GetCurrentScene()->UiToScreen((sf::Vector2f)mouse->GetPosition());
 	worldPos = SCENE_MGR.GetCurrentScene()->ScreenToWorld((sf::Vector2i)ScreenPos);
+
 	HandleRopeSwing(dt);
 
-	//std::cout << GetPosition().x << " " << GetPosition().y << std::endl;
 
 	//std::cout << velocity.y << std::endl;
 	//std::cout << animator->GetCurrentClipId() << std::endl;
@@ -193,6 +193,7 @@ void Player::Update(float dt)
 
 	if (InputMgr::GetKeyDown(sf::Keyboard::LShift) && !isSwinging)
 	{
+		chargeDashDt = 0.f;
 		weapon->SetTexture("graphics/player/Charge_Dash/Charge_Desh/Arm_Charge_Desh_Start/Spr_SNBArm_ChargeDashChargeStart (1).png");
 		weapon->SetOrigin(Origins::MC);
 		isChargeDash = true;
@@ -258,9 +259,10 @@ void Player::Update(float dt)
 				});
 
 			if (CloseEnemy != enemys->end() && Utils::Distance(GetPosition(), 
-				(*CloseEnemy)->GetPosition()) < 500)
+				(*CloseEnemy)->GetPosition()) < 500 && chargeDashDt >= chargeDashDuration)
 			{
 				// 가까운 적 찾음 공격 시작
+				chargeDashDt = 0.f;
 				SetPosition((*CloseEnemy)->GetPosition());
 				SetRotation(Utils::Angle((*CloseEnemy)->GetPosition() - GetPosition()));
 				animator->Play("Player_Charge_Dash");
@@ -498,6 +500,12 @@ sf::Vector2i Player::PreviewRopeFind()
 	int x = static_cast<int>(worldPos.x / tileMap->GetTileSize().x);
 	int y = static_cast<int>(worldPos.y / tileMap->GetTileSize().y);
 
+	if (x <= 1 || x >= tileMap->GetMapSize().x - 1 ||
+		y <= 1 || y >= tileMap->GetMapSize().y - 1)
+	{
+		return closestTileIndex;
+	}
+
 	if (tileMap->GetTiles()[y][x].type == TileMap::TileType::WALL)
 	{
 		x *= 50;
@@ -515,14 +523,14 @@ sf::Vector2i Player::PreviewRopeFind()
 
 void Player::PlayerShiftRolling()
 {
-	std::cout << "PlayerShiftRolling!!" << std::endl;
+	//std::cout << "PlayerShiftRolling!!" << std::endl;
 	isShiftRolling = false;
 	//animator->Play("PlayerShiftRolling");
 }
 
 void Player::PlayerJumping()
 {
-	std::cout << "Player_Jumping!!" << std::endl;
+	//std::cout << "Player_Jumping!!" << std::endl;
 	animator->Play("Player_Jumping");
 }
 
@@ -647,6 +655,7 @@ void Player::PlayerEnemysCollisions(float dt)
 							contains(enemy->GetPosition()))
 					{
 						SetPosition(enemy->GetPosition());
+						enemy->Dead();
 						return;
 					}
 					else
@@ -868,6 +877,9 @@ void Player::Attacked()
 void Player::Dead()
 {
 	SCENE_MGR.ChangeScene(SceneIds::SceneTitle);
+	SOUND_MGR.StopBGM();
+	hp = 5;
+	bossMajor->SetFight(false);
 }
 
 void Player::UpdateSwing(float dt)

@@ -35,6 +35,18 @@ void Enemy_RifleMan::Init()
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Enemy_RifleMan_Shooting.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Enemy_RifleMan_Ready_Shot.csv"));
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Enemy_RifleMan_Dead.csv"));
+	
+	animator->AddEvent("Enemy_RifleMan_Dead", 5, [this]()
+		{
+			SetTexture("graphics/Enemy/RifleMan/Spr_ENE_Rifleman_Dead (7).png");
+			SetOrigin(Origins::TC);
+		});
+
+
+	animator->AddEvent("Enemy_RifleMan_Dead", 13, [this]()
+		{
+			SetActive(false);
+		});
 
 	SetTexture("graphics/Enemy/RifleMan/Spr_ENE_Rifleman_Ready2Shot.png");
 
@@ -71,7 +83,12 @@ void Enemy_RifleMan::Reset()
 void Enemy_RifleMan::Update(float dt)
 {
 	Enemy::Update(dt);
-	gunAnimator->Update(dt);
+
+	if (gun->GetActive())
+	{
+		gun->Update(dt);
+		gunAnimator->Update(dt);
+	}
 	
 	//std::cout << isShooting << std::endl;
 	//std::cout << shootingCurrentCount << std::endl;
@@ -112,7 +129,7 @@ void Enemy_RifleMan::Update(float dt)
 	switch (currentStatus)
 	{
 	case Enemy_RifleMan::Status::IDLE:
-		if (InputMgr::GetKeyDown(sf::Keyboard::Num1))
+		if (Utils::Distance(player->GetPosition(), GetPosition()) <= 500)
 		{
 			currentStatus = Status::AIMING;
 		}
@@ -202,7 +219,9 @@ void Enemy_RifleMan::LateUpdate(float dt)
 void Enemy_RifleMan::Draw(sf::RenderWindow& window)
 {
 	Enemy::Draw(window);
-	gun->Draw(window);
+
+	if(gun->GetActive())
+		gun->Draw(window);
 
 	for (auto& data : bullets)
 	{
@@ -216,6 +235,8 @@ void Enemy_RifleMan::Draw(sf::RenderWindow& window)
 void Enemy_RifleMan::Dead()
 {
 	animator->Play("Enemy_RifleMan_Dead");
+	currentStatus = Status::DEAD;
+	gun->SetActive(false);
 }
 
 void Enemy_RifleMan::AnimationIdle()

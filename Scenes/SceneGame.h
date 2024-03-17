@@ -6,6 +6,7 @@ class TileMap;
 class Enemy_RifleMan;
 class Enemy;
 class BossMajor;
+class UIGameScene;
 
 class SceneGame : public Scene
 {
@@ -13,10 +14,12 @@ protected:
 	Player* player = nullptr;
 	TileMap* tileMap = nullptr;
 	BossMajor* bossMajor = nullptr;
+	UIGameScene* uiGameScene = nullptr;
+
 
 	//Enemy_RifleMan* rifleman = nullptr;
 
-	std::list<Enemy*> enemys;
+	std::vector<Enemy*> enemys;
 	float fff = 20.f;
 public:
 
@@ -43,7 +46,7 @@ public:
 
 	Player* GetPlayer();
 	TileMap* GetTileMap();
-	std::list<Enemy*>* GetEnemys();
+	std::vector<Enemy*>* GetEnemys();
 	BossMajor* GetBossMajor();
 };
 

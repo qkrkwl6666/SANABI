@@ -12,13 +12,14 @@ public:
 	{
 		NONE,
 		IDLE,
-		SPHERE_ATTACK,
 		MOVE,
+		SPHERE_ATTACK,
 		RUSH_ATTACK,
 		NORMAL1_ATTACK,
 		GRENADES_ATTACK,
 		TAKE_DOWN,
 		DAMAGED_KNOCK_BACK,
+		CHANGE_PAGE,
 		COUNT,
 	};
 
@@ -48,6 +49,10 @@ protected:
 	float rushSpeed = 300.f;
 	float KnockBackSpeed = 50.f;
 
+	int hp = 10;
+
+	bool isChangePage = false;
+	bool isFight = false;
 	bool isSphere_Attack = false;
 	bool isMove = false;
 	bool isRush_Attack = false;
@@ -74,6 +79,7 @@ public:
 	void isMoving();
 
 	void SetCurrentStatus(Status status);
+	void SetFight(bool isFight = true){ this->isFight = isFight; }
 
 	void SkillCencle();
 

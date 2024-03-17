@@ -303,7 +303,6 @@ void TileMap::LoadTileMap(const std::string& filePath ,const float setOutlineThi
 
 		//std::cout << str_currentPath << std::endl;
 
-		// 여기서 각 타일을 초기화합니다. 예를 들어:
 		tiles[y][x] = Tile(sf::Vector2f(x * tileSize.x, y * tileSize.y), tileSize, (int)type);
 		tiles[y][x].textureFilePath = textureFilePath;
 
@@ -320,6 +319,10 @@ void TileMap::LoadTileMap(const std::string& filePath ,const float setOutlineThi
 			}
 			tiles[y][x].shape.setTexture(&tiles[y][x].texture);
 			tiles[y][x].shape.setFillColor(sf::Color::White);
+		}
+		else
+		{
+			tiles[y][x].shape.setFillColor(sf::Color::Transparent);
 		}
 		if (setOutlineThickness > 0.1f)
 		{

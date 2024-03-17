@@ -27,7 +27,7 @@ protected:
 	TileMap* tileMap = nullptr;
 	BossMajor* bossMajor = nullptr;
 
-	int hp = 5;
+	int hp = 30;
 	bool isAttacked = false;
 	bool isInvincible = false;
 
@@ -36,7 +36,7 @@ protected:
 	float InvincibleDt = 0.f;
 	float InvincibleDuration = 3.f;
 
-	std::list<Enemy*>* enemys;
+	std::vector<Enemy*>* enemys;
 
 	float chargeDashSpeed = 1000.f;
 

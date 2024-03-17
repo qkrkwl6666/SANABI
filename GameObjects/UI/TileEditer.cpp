@@ -265,6 +265,9 @@ void TileEditer::Update(float dt)
 	screenPos = SCENE_MGR.GetCurrentScene()->UiToScreen((sf::Vector2f)mouse->GetPosition());
 	worldPos = SCENE_MGR.GetCurrentScene()->ScreenToWorld(screenPos);
 
+
+	std::cout << worldPos.x << " " << worldPos.y << std::endl;
+
 	if (InputMgr::GetMouseButtonDown(sf::Mouse::Middle))
 	{
 		lastMouseWorldPos = worldPos; // 현재 마우스 위치를 저장합니다.
@@ -468,7 +471,6 @@ void TileEditer::TileTypeMouseSelection()
 			selectTypeBoxs[i]->SetTexture("graphics/UI/UI_WarningWindow_SelectBox.png");
 		}
 	}
-
 
 }
 

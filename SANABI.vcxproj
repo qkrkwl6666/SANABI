@@ -175,6 +175,7 @@
     <ClCompile Include="Scenes\SceneTileEditer.cpp" />
     <ClCompile Include="GameObjects\UI\TileEditer.cpp" />
     <ClCompile Include="GameObjects\Base\SpriteAnimatorGo.cpp" />
+    <ClCompile Include="GameObjects\UI\UIGameScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameObjects\Frail.h" />
@@ -219,6 +220,7 @@
     <ClInclude Include="Scenes\SceneTileEditer.h" />
     <ClInclude Include="GameObjects\UI\TileEditer.h" />
     <ClInclude Include="GameObjects\Base\SpriteAnimatorGo.h" />
+    <ClInclude Include="GameObjects\UI\UIGameScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MySnippet\XMLFile.snippet" />
