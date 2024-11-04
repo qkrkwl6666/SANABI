@@ -11,30 +11,16 @@
 #include "BossMajor.h"
 
 Player::Player(const std::string& name)
-	:SpriteGo(name)
-{
-
-}
+	: SpriteGo(name)
+{}
 
 Player::~Player()
 {
 	Delete();
 }
 
-//void Player::TestStatic()
-//{
-//	std::cout << "TestStatic" << std::endl;
-//}
-//
-//void Player::TestInstance()
-//{
-//	std::cout << "TestInstance" << std::endl;
-//}
-
 void Player::Init()
 {
-	// TODO : 플레이어 sortLayer 하면 팅기는 현상있음 
-	// 플레이어 스프라이트 적용후 오리진 잡기
 	SpriteGo::Init();
 	animator = new Animator();
 	animator->SetTarget(&sprite);
@@ -80,76 +66,10 @@ void Player::Init()
 	// TakeDown
 	animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/TakeDown/Player_TakeDown.csv"));
 
-	/*auto* clip = animator->GetClip("Player_Run_Landing");
-	clip->fps = 30;*/
-	
-	//animator->AddClip(RES_MGR_ANIMATIONCLIP.Get("data/Animations/Run.csv"));
-}
-
-void Player::Reset()
-{
-	animator->ClearEvent();
-
-	std::function<void()> funcInstanceShiftRolling = std::bind(&Player::PlayerShiftRolling, this);
-	animator->AddEvent("Player_Shift_Rolling", 5, funcInstanceShiftRolling);
-
-	animator->AddEvent("Player_Charge_Dash_Charge_Start", 21, [this]()
-		{
-			//std::cout << "ChargeDash!!" << std::endl;
-
-			weapon->SetTexture("graphics/player/Charge_Dash/Charge_Desh/Arm_Charge_Desh_Loop/Spr_SNBArm_ChargeDashChargeLoop (lp) (1).png");
-			weapon->SetOrigin(Origins::ML);
-			animator->Play("Player_Charge_Dash_Charge_Loop");
-			weaponAnimator->Play("Arm_Charge_Dash_Charge_Loop");
-		});
-
-	animator->AddEvent("Player_Charge_Dash", 9, [this]()
-		{
-			//std::cout << "ChargeDash Attack!!" << std::endl;
-
-			animator->Play("Player_Charge_Attack");
-			weaponAnimator->Play("Arm_Charge_Attack");
-		});
-
-	animator->AddEvent("Player_Charge_Attack", 8, [this]()
-		{
-			//std::cout << "Player_Charge_Attack Finish!!" << std::endl;
-
-			weapon->SetTexture("graphics/Spr_SNBArm.png");
-			weapon->SetOrigin(Origins::MC);
-			this->SetChargeDash(false);
-			this->SetStatus(Status::IDLE);
-		});
-
-	//Player_Damaged_Dash
-
-	animator->AddEvent("Player_Damaged_Dash", 2, [this]()
-		{
-			//std::cout << "Player_Damaged_Dash" << std::endl;
-			isAttacked = false;
-			currentStatus = Status::IDLE;
-			InvincibleDt = 0.f;
-			//velocity.x = 1500;
-		});
-
-	// TakeDown
-	animator->AddEvent("Spr_SNB_TakeDownByMajor", 9, [this]()
-		{
-			currentStatus = Status::ATTACKED;
-			isTakeDown = false;
-			Attacked();
-		});
-
-	//Spr_SNB_TakeDownByMajor
-
-	//std::function<void()> funcInstance2 = std::bind(&Player::PlayerJumping, this);
-	//animator->AddEvent("Player_Falling", 2, funcInstance2);
-
-	//std::function<void()> funcStatic = std::bind(&Player::TestStatic);
-	//animator.AddEvent("data/Idle.csv", 5, funcStatic);
-
-	/*PlayerAnimationPlay("data/Animations/Player_Idle.csv",
-		"data/Animations/Player_Arm_Idle.csv");*/
+	// 로프 스윙 관련 초기 설정
+	swingForce = 500.f; // 스윙 가속도
+	initialSwingAcceleration = 0.f;
+	dampingFactor = 0.95f;
 
 	tileMap = dynamic_cast<SceneGame*>(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetTileMap();
 	enemys = dynamic_cast<SceneGame*>(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetEnemys();
@@ -161,11 +81,70 @@ void Player::Reset()
 	weaponAnimator->Play("Player_Arm_Idle");
 
 	WeaponPoint = { GetPosition().x - 30, GetPosition().y + 30 };
-	
+	weapon->SetPosition(WeaponPoint);
+
+	SetPosition({ 180.f, 1900.f });
+}
+
+void Player::Reset()
+{
+	animator->ClearEvent();
+
+	std::function<void()> funcInstanceShiftRolling = std::bind(&Player::PlayerShiftRolling, this);
+	animator->AddEvent("Player_Shift_Rolling", 5, funcInstanceShiftRolling);
+
+	animator->AddEvent("Player_Charge_Dash_Charge_Start", 21, [this]()
+		{
+			weapon->SetTexture("graphics/player/Charge_Dash/Charge_Desh/Arm_Charge_Desh_Loop/Spr_SNBArm_ChargeDashChargeLoop (lp) (1).png");
+			weapon->SetOrigin(Origins::ML);
+			animator->Play("Player_Charge_Dash_Charge_Loop");
+			weaponAnimator->Play("Arm_Charge_Dash_Charge_Loop");
+		});
+
+	animator->AddEvent("Player_Charge_Dash", 9, [this]()
+		{
+			animator->Play("Player_Charge_Attack");
+			weaponAnimator->Play("Arm_Charge_Attack");
+		});
+
+	animator->AddEvent("Player_Charge_Attack", 8, [this]()
+		{
+			weapon->SetTexture("graphics/Spr_SNBArm.png");
+			weapon->SetOrigin(Origins::MC);
+			this->SetChargeDash(false);
+			this->SetStatus(Status::IDLE);
+		});
+
+	// Attacked
+	animator->AddEvent("Player_Damaged_Dash", 2, [this]()
+		{
+			isAttacked = false;
+			currentStatus = Status::IDLE;
+			InvincibleDt = 0.f;
+		});
+
+	// TakeDown
+	animator->AddEvent("Spr_SNB_TakeDownByMajor", 9, [this]()
+		{
+			currentStatus = Status::ATTACKED;
+			isTakeDown = false;
+			Attacked();
+		});
+
+	// 초기 상태 설정
+	tileMap = dynamic_cast<SceneGame*>(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetTileMap();
+	enemys = dynamic_cast<SceneGame*>(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetEnemys();
+	bossMajor = dynamic_cast<SceneGame*>(SCENE_MGR.GetScene(SceneIds::SceneGame))->GetBossMajor();
+
+	weaponAnimator = weapon->GetAnimator();
+	sortLayer = 22;
+	animator->Play("Player_Idle");
+	weaponAnimator->Play("Player_Arm_Idle");
+
+	WeaponPoint = { GetPosition().x - 30, GetPosition().y + 30 };
 	weapon->SetPosition(WeaponPoint);
 
 	SetPosition({ 180.f , 1900.f });
-	//SetPosition({ 8000.f , 1500.f });
 }
 
 void Player::Update(float dt)
@@ -174,23 +153,17 @@ void Player::Update(float dt)
 	animator->Update(dt);
 	weaponAnimator->Update(dt);
 
-	//std::cout << PreviewRopeFind().x << std::endl;
-	//std::cout << PreviewRopeFind().y << std::endl;
-
 	std::cout << hp << std::endl;
-	// Status 만들고 상태에 따른 Update 해야하지만 보스 먼저 하고 나중에?
-	
+
+	// 마우스 위치 업데이트
 	ScreenPos = SCENE_MGR.GetCurrentScene()->UiToScreen((sf::Vector2f)mouse->GetPosition());
 	worldPos = SCENE_MGR.GetCurrentScene()->ScreenToWorld((sf::Vector2i)ScreenPos);
 
 	HandleRopeSwing(dt);
 
+	float h = InputMgr::GetAxisRaw(Axis::Horizontal); // -1, 0, 1
 
-	//std::cout << velocity.y << std::endl;
-	//std::cout << animator->GetCurrentClipId() << std::endl;
-
-	float h = InputMgr::GetAxisRaw(Axis::Horizontal); // - 1 0 1
-
+	// Shift 대시 시작
 	if (InputMgr::GetKeyDown(sf::Keyboard::LShift) && !isSwinging)
 	{
 		chargeDashDt = 0.f;
@@ -203,24 +176,25 @@ void Player::Update(float dt)
 	}
 	// Shift 구현
 
+	// 스윙 상태에서의 입력 처리
 	if (isSwinging)
 	{
-		if (InputMgr::GetKey(sf::Keyboard::A) && InputMgr::GetKey(sf::Keyboard::LShift))
+		bool isLeftShift = InputMgr::GetKey(sf::Keyboard::A) && InputMgr::GetKey(sf::Keyboard::LShift);
+		bool isRightShift = InputMgr::GetKey(sf::Keyboard::D) && InputMgr::GetKey(sf::Keyboard::LShift);
+
+		if (isLeftShift)
 		{
 			velocity.y = -300;
 			velocity.x = -1000;
 		}
-		else if (InputMgr::GetKey(sf::Keyboard::D) && InputMgr::GetKey(sf::Keyboard::LShift))
+		else if (isRightShift)
 		{
 			velocity.y = -300;
 			velocity.x = +1000;
 		}
-		//if (InputMgr::GetKeyDown(sf::Keyboard::Space))
-		//{
-		//	SetPosition(ropeAnchorPoint);
-		//}
 	}
 
+	// 현재 상태에 따른 업데이트
 	switch (currentStatus)
 	{
 	case Player::Status::IDLE:
@@ -249,7 +223,7 @@ void Player::Update(float dt)
 		if (InputMgr::GetKeyUp(sf::Keyboard::LShift))
 		{
 			auto CloseEnemy = std::min_element(enemys->begin(), enemys->end(), [this]
-			(const Enemy* lhs , const Enemy* rhs)
+			(const Enemy* lhs, const Enemy* rhs)
 				{
 					float lhsLeng = Utils::Distance(GetPosition(), lhs->GetPosition());
 					float rhsLeng = Utils::Distance(GetPosition(), rhs->GetPosition());
@@ -257,7 +231,7 @@ void Player::Update(float dt)
 					return lhsLeng < rhsLeng;
 				});
 
-			if (CloseEnemy != enemys->end() && Utils::Distance(GetPosition(), 
+			if (CloseEnemy != enemys->end() && Utils::Distance(GetPosition(),
 				(*CloseEnemy)->GetPosition()) < 500 && chargeDashDt >= chargeDashDuration)
 			{
 				// 가까운 적 찾음 공격 시작
@@ -267,9 +241,9 @@ void Player::Update(float dt)
 				animator->Play("Player_Charge_Dash");
 				weaponAnimator->Play("Arm_Charge_Desh");
 				(*CloseEnemy)->Dead();
-				
+
 			}
-			else if (Utils::Distance(GetPosition(), bossMajor->GetPosition()) < 500 
+			else if (Utils::Distance(GetPosition(), bossMajor->GetPosition()) < 500
 				&& chargeDashDt >= chargeDashDuration)
 			{
 				chargeDashDt = 0.f;
@@ -320,8 +294,6 @@ void Player::Update(float dt)
 		break;
 	}
 
-	//std::cout << swingAcceleration << std::endl;
-
 	// 속도에 따른 스윙 가속도 증가 로직
 	speedFactor = std::abs(velocity.x) / speed; // 현재 속도를 최대 속도로 나눈 비율
 
@@ -344,16 +316,10 @@ void Player::Update(float dt)
 	if (isSwinging)
 	{
 		HandleSwingMotion(dt, speedFactor);
-
-		//if (!isSwingingAnimation)
-		//{
-		//	animator->Play("Player_Ceiling_Stick_Moving");
-		//	isSwingingAnimation = true;
-		//}
 	}
 	else
 	{
-		if(!isCollisions && !isChargeDash)
+		if (!isCollisions && !isChargeDash)
 			Translate(velocity * dt);
 	}
 
@@ -385,7 +351,7 @@ void Player::Update(float dt)
 	}
 	else
 	{
-		WeaponPoint = { 10.f , 0.f};
+		WeaponPoint = { 10.f , 0.f };
 	}
 
 	{
@@ -409,9 +375,9 @@ void Player::Update(float dt)
 
 		//TODO : Player_Run_Start 실행후 > Player_Running 실행하기
 
-		else if ((animator->GetCurrentClipId() == "Player_Jumping" || 
-					animator->GetCurrentClipId() == "Player_Falling" ||  
-					animator->GetCurrentClipId() == "Player_Ceiling_Stick_Moving") && isGround)
+		else if ((animator->GetCurrentClipId() == "Player_Jumping" ||
+			animator->GetCurrentClipId() == "Player_Falling" ||
+			animator->GetCurrentClipId() == "Player_Ceiling_Stick_Moving") && isGround)
 		{
 			if (h == 0.f)
 			{
@@ -488,13 +454,13 @@ void Player::Draw(sf::RenderWindow& window)
 
 void Player::PlayerAnimationPlay(const std::string& player, const std::string& weapon, bool clearQueue)
 {
-	animator->Play(player , clearQueue);
-	weaponAnimator->Play(weapon , clearQueue);
+	animator->Play(player, clearQueue);
+	weaponAnimator->Play(weapon, clearQueue);
 }
 
 sf::Vector2i Player::PreviewRopeFind()
 {
-	sf::Vector2i closestTileIndex(-1, -1); 
+	sf::Vector2i closestTileIndex(-1, -1);
 
 	int x = static_cast<int>(worldPos.x / tileMap->GetTileSize().x);
 	int y = static_cast<int>(worldPos.y / tileMap->GetTileSize().y);
@@ -516,8 +482,6 @@ sf::Vector2i Player::PreviewRopeFind()
 	{
 		return closestTileIndex;
 	}
-	
-
 }
 
 void Player::PlayerShiftRolling()
@@ -552,7 +516,7 @@ bool Player::PlayerTileCollisions(float dt)
 		tileIndex.y >= 2 && tileIndex.y < tileMap->GetMapSize().y - 2)
 	{
 		// 하단 타일
-	// 플레이어의 하단 타일
+		// 플레이어의 하단 타일
 		sf::Vector2i bottomIndex = { tileIndex.x , tileIndex.y + 1 };
 
 		if (tileMap->GetTiles()[bottomIndex.y][bottomIndex.x].type == TileMap::TileType::WALL)
@@ -607,6 +571,7 @@ bool Player::PlayerTileCollisions(float dt)
 			}
 		}
 
+		// 플레이어의 왼쪽 타일
 		sf::Vector2i LeftIndex = { tileIndex.x - 1 , tileIndex.y };
 
 		if (tileMap->GetTiles()[LeftIndex.y][LeftIndex.x].type == TileMap::TileType::WALL)
@@ -615,9 +580,9 @@ bool Player::PlayerTileCollisions(float dt)
 				tileMap->GetTiles()[LeftIndex.y][LeftIndex.x].shape.getGlobalBounds().left
 				+ tileMap->GetTiles()[LeftIndex.y][LeftIndex.x].shape.getGlobalBounds().width)
 			{
-				SetPosition({ tileMap->GetTiles()[LeftIndex.y][LeftIndex.x].
-					shape.getGlobalBounds().left + tileMap->GetTiles()[LeftIndex.y][LeftIndex.x].
-					shape.getGlobalBounds().width + (GetGlobalBounds().width / 2) ,
+				SetPosition({ tileMap->GetTiles()[LeftIndex.y][LeftIndex.x].shape.getGlobalBounds().left +
+					tileMap->GetTiles()[LeftIndex.y][LeftIndex.x].shape.getGlobalBounds().width +
+					(GetGlobalBounds().width / 2) ,
 					GetPosition().y });
 				isCollisions = true;
 				//return true;
@@ -646,12 +611,12 @@ void Player::PlayerEnemysCollisions(float dt)
 			{
 				// PASS가 아닌 타일에만 로프를 걸 수 있음
 				auto it = enemys->begin();
-				
+
 				while (it != enemys->end())
 				{
 					Enemy* enemy = *it;
 					if (tileMap->GetTiles()[y][x].shape.getGlobalBounds().
-							contains(enemy->GetPosition()))
+						contains(enemy->GetPosition()))
 					{
 						SetPosition(enemy->GetPosition());
 						enemy->Dead();
@@ -665,7 +630,7 @@ void Player::PlayerEnemysCollisions(float dt)
 
 				// 보스 처리
 				if (tileMap->GetTiles()[y][x].shape.getGlobalBounds().
-							contains(bossMajor->GetPosition()))
+					contains(bossMajor->GetPosition()))
 				{
 					currentStatus = Status::TAKE_DOWN;
 					bossMajor->SetCurrentStatus(BossMajor::Status::TAKE_DOWN);
@@ -679,9 +644,9 @@ void Player::PlayerEnemysCollisions(float dt)
 
 void Player::HandleRopeSwing(float dt)
 {
+	// 스윙 시작
 	if (InputMgr::GetMouseButtonDown(sf::Mouse::Left) && !isSwinging)
 	{
-		angularVelocity = 0.0f; // 스윙 시작 시 각속도 초기화
 		sf::Vector2i closestTile = FindClosestTile();
 		if (closestTile != sf::Vector2i(-1, -1))
 		{
@@ -696,66 +661,54 @@ void Player::HandleRopeSwing(float dt)
 
 	if (isSwinging)
 	{
-		UpdateSwing(dt); // 스윙 중 업데이트
-	}
+		// 스윙 입력 처리
+		bool isLeftPressed = InputMgr::GetKeyDown(sf::Keyboard::A);
+		bool isRightPressed = InputMgr::GetKeyDown(sf::Keyboard::D);
 
-	if (!isSwinging) return;
-
-	sf::Vector2f anchorToPoint = GetPosition() - ropeAnchorPoint;
-	float angle = atan2(anchorToPoint.y, anchorToPoint.x);
-
-	// 스윙 가속도 조절
-	if (InputMgr::GetKeyDown(sf::Keyboard::A))
-	{
-		swingAcceleration -= swingForce * dt;
-	}
-	else if (InputMgr::GetKeyDown(sf::Keyboard::D))
-	{
-		swingAcceleration += swingForce * dt;
-	}
-
-	// 스윙 중 velocity 조절
-	velocity += CalculateSwingForce(anchorToPoint, swingAcceleration, dt);
-	ClampVelocity(velocity, -500.f, 500.f); // velocity.y의 최대/최솟값 제한
-
-	// 로프의 길이를 고려하여 위치 보정
-	sf::Vector2f correctedPos = ClampToRopeLength(GetPosition() + velocity * dt, ropeAnchorPoint, ropeLength);
-	SetPosition(correctedPos);
-
-	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left) && isSwinging)
-	{
-		// 스윙 종료 로직
-		isSwinging = false;
-
+		if (isLeftPressed)
 		{
-			if (swingAcceleration >= 350.f && swingAcceleration <= 10000.f && !isShiftRolling)
+			swingAcceleration -= swingForce * dt;
+		}
+		if (isRightPressed)
+		{
+			swingAcceleration += swingForce * dt;
+		}
+
+		// 스윙 물리 적용
+		sf::Vector2f anchorToPoint = GetPosition() - ropeAnchorPoint;
+		float angle = atan2(anchorToPoint.y, anchorToPoint.x);
+
+		velocity += CalculateSwingForce(anchorToPoint, swingAcceleration, dt);
+		ClampVelocity(velocity, -500.f, 500.f); // velocity.y의 최대/최솟값 제한
+
+		// 위치 보정
+		sf::Vector2f newPos = GetPosition() + velocity * dt;
+		sf::Vector2f correctedPos = ClampToRopeLength(newPos, ropeAnchorPoint, ropeLength);
+		SetPosition(correctedPos);
+
+		// 스윙 종료 조건
+		if (!sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+			isSwinging = false;
+
+			// 스윙 가속도가 특정 범위 내에 있고, Shift 롤링 중이 아닐 때만 실행
+			if ((swingAcceleration >= 350.f || swingAcceleration <= -350.f) && std::abs(swingAcceleration) <= 10000.f && !isShiftRolling)
 			{
 				animator->Play("Player_Shift_Rolling");
 				weaponAnimator->Play("Player_Arm_Shift_Rolling");
 			}
-			else if (swingAcceleration <= -350.f && swingAcceleration >= -10000.f && !isShiftRolling)
+
+			swingAcceleration = 0.f; // 스윙 중단 시 가속도 초기화
+
+			// 스윙을 풀었을 때의 velocity.y 조정
+			if (velocity.y > 0)
 			{
-				animator->Play("Player_Shift_Rolling");
-				weaponAnimator->Play("Player_Arm_Shift_Rolling");
+				velocity.y = -250.f; // 하강 중 상승 효과 부여
 			}
-			//else
-			//{
-			//	animator->Play("Player_Falling");
-			//	weaponAnimator->Play("Player_Arm_Falling");
-			//}
-
 		}
 
-		swingAcceleration = 0; // 스윙 중단 시 가속도 초기화
-
-		// 스윙을 풀었을 때의 velocity.y 조정
-		// 예를 들어, velocity.y가 양수 (하강 중)일 경우, 상승 효과를 주기 위해 값을 조정
-		if (velocity.y > 0)
-		{
-			// 상승 효과를 위한 velocity.y 조정
-			// 이 값은 게임의 필요에 따라 조절 가능
-			velocity.y = -250; // 예시 값, 상황에 따라 조절 필요
-		}
+		// 감쇠 적용
+		swingAcceleration *= dampingFactor;
 	}
 }
 
@@ -792,11 +745,13 @@ sf::Vector2i Player::FindClosestTile()
 			// 검사 범위가 타일맵 내에 있는지 확인
 			if (x >= 0 && x < tileMap->GetMapSize().x && y >= 0 && y < tileMap->GetMapSize().y)
 			{
-				if (tileMap->GetTiles()[y][x].type == TileMap::TileType::WALLNOGRAB || 
+				// WALLNOGRAB 또는 PASS 타입은 제외
+				if (tileMap->GetTiles()[y][x].type == TileMap::TileType::WALLNOGRAB ||
 					tileMap->GetTiles()[y][x].type == TileMap::TileType::PASS)
 				{
 					continue;
 				}
+
 				// PASS가 아닌 타일에만 로프를 걸 수 있음
 				auto it = enemys->begin();
 
@@ -850,7 +805,6 @@ void Player::HandleSwingMotion(float dt, float speedFactor)
 	sf::Vector2f newPos = GetPosition() + velocity * dt;
 	sf::Vector2f correctedPos = ropeAnchorPoint + Utils::GetNormalize(newPos - ropeAnchorPoint) * ropeLength;
 	SetPosition(correctedPos);
-
 }
 
 void Player::Attacked()
@@ -879,20 +833,4 @@ void Player::Dead()
 	SOUND_MGR.StopBGM();
 	hp = 5;
 	bossMajor->SetFight(false);
-}
-
-void Player::UpdateSwing(float dt)
-{
-	if (!isSwinging) return;
-
-	sf::Vector2f anchorToPoint = GetPosition() - ropeAnchorPoint;
-	float angle = atan2(anchorToPoint.y, anchorToPoint.x);
-
-	// 스윙 방향에 따라 위치 업데이트
-	float swingSpeed = swingAcceleration * swingDirection;
-	sf::Vector2f movement = Utils::GetNormalize(anchorToPoint) * swingSpeed * dt;
-	SetPosition(GetPosition() + movement);
-
-	// 감쇠 적용
-	swingAcceleration *= dampingFactor;
 }

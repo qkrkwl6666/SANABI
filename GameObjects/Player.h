@@ -159,21 +159,18 @@ public:
 	}
 
 	sf::Vector2f ClampToRopeLength(const sf::Vector2f& newPos, const sf::Vector2f& ropeAnchorPoint, float ropeLength) {
-		// 고정점에서 새 위치까지의 벡터를 계산합니다.
+
 		sf::Vector2f anchorToPoint = newPos - ropeAnchorPoint;
     
-		// 벡터의 길이(거리)를 계산합니다.
 		float currentLength = std::sqrt(anchorToPoint.x * anchorToPoint.x + anchorToPoint.y * anchorToPoint.y);
-    
-		// 현재 길이가 로프의 최대 길이보다 큰 경우, 길이를 로프의 최대 길이로 제한합니다.
+
 		if (currentLength > ropeLength) {
-			// 벡터를 정규화하고, 로프의 최대 길이를 곱하여 조정된 벡터를 얻습니다.
+			
 			sf::Vector2f normalized = anchorToPoint / currentLength;
 			sf::Vector2f clampedPosition = ropeAnchorPoint + normalized * ropeLength;
 			return clampedPosition;
 		}
     
-		// 조정이 필요 없는 경우, 원래의 새 위치를 반환합니다.
 		return newPos;
 	}
 
